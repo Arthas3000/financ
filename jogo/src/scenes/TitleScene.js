@@ -21,6 +21,7 @@ export class TitleScene {
     this.highScore = loadHighScore();
     this.menu = this._mainMenu();
     this.dialog = null;
+    this.pending = null; // { at, action } — ação adiada (deixa o botão piscar antes de sair)
   }
 
   enter() { this.game.audio.playMusic('audio/musica/titulo'); }
@@ -35,6 +36,10 @@ export class TitleScene {
   update(dt) {
     this.t += dt;
     const { input, audio } = this.game;
+    if (this.pending && this.t >= this.pending.at) {
+      this.pending.action();
+      this.pending = null;
+    }
 
     if (this.state === 'press') {
       if (this.t > 0.9 && (input.confirm() || input.pointer?.clicked)) {
@@ -50,7 +55,7 @@ export class TitleScene {
       const chosen = this.menu.update(dt);
       if (chosen?.action === 'start') {
         this.state = 'leaving';
-        setTimeout(() => this.game.transitionTo(() => new SelectScene(this.game), { duration: 0.4 }), 450);
+        this.pending = { at: this.t + 0.45, action: () => this.game.transitionTo(() => new SelectScene(this.game), { duration: 0.4 }) };
       } else if (chosen?.action === 'exit') {
         this.state = 'confirmExit';
         this.dialog = new ButtonMenu(this.game, [
@@ -69,7 +74,7 @@ export class TitleScene {
       if (chosen?.action === 'yes') {
         this.state = 'leaving';
         audio.stopMusic(0.6);
-        setTimeout(() => this.game.transitionTo(() => new GoodbyeScene(this.game), { duration: 0.6 }), 400);
+        this.pending = { at: this.t + 0.4, action: () => this.game.transitionTo(() => new GoodbyeScene(this.game), { duration: 0.6 }) };
       } else if (chosen?.action === 'no' || (!chosen && input.cancel())) {
         if (!chosen) audio.play('audio/sfx/ui_voltar');
         this.state = 'menu';

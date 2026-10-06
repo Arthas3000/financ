@@ -35,7 +35,7 @@ export class Entity {
     return { x, y: this.bottom + b.y, w: b.w, h: b.h };
   }
 
-  /** Desenha o sprite atual. `blink` = piscar durante invencibilidade. */
+  /** Desenha o sprite atual com os pés no centro inferior do corpo. */
   drawSprite(r, { alpha = 1 } = {}) {
     this.anim?.draw(r, this.centerX, this.bottom, { flipX: this.facing === -1, alpha });
   }

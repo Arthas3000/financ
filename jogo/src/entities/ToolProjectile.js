@@ -31,7 +31,6 @@ export class ToolProjectile {
     this.removed = false;
     this.damage = tool.damage;
     this.facing = facing;
-    this.id = Symbol('ferramenta'); // cada ferramenta acerta um inimigo só uma vez
   }
 
   get box() {

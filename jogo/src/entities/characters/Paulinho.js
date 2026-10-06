@@ -5,7 +5,7 @@
 import { Player } from '../Player.js';
 
 export class Paulinho extends Player {
-  onAttackFrame(frame) {
+  onAttackFrame() {
     const def = this.attack.def;
     if (def.impactFrame !== undefined && this.anim.entered(def.impactFrame) && this.onGround) {
       this.scene.shake(def.impactShake, 0.25);

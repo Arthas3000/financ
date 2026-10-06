@@ -11,6 +11,8 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // o jogo (pasta jogo/) não é parte do app: não intercepta nem guarda no cache
+  if (url.pathname.includes("/jogo/")) return;
   // páginas: tenta a rede (para receber atualizações), cai no cache se estiver offline
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => { if (r.ok && (r.headers.get("content-type") || "").includes("text/html")) { const cp = r.clone(); caches.open(CACHE).then(c => c.put("./index.html", cp)); } return r; })

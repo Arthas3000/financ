@@ -6,6 +6,7 @@
 
 import { SOLID, ONE_WAY } from '../world/Level.js';
 import { TILE } from '../config/constants.js';
+import { overlaps } from '../core/math.js';
 
 export class OilCanProjectile {
   constructor(scene, { x, y, targetX, targetY, cfg }) {
@@ -33,7 +34,7 @@ export class OilCanProjectile {
     this.rotation += this.spin * dt;
 
     const player = this.scene.player;
-    if (player.alive && this._overlaps(player.box)) {
+    if (player.alive && overlaps(this.box, player.box)) {
       if (player.hurt(this.cfg.damage, this.x, this.cfg.knockback)) return this._splash();
     }
     const bottom = this.y + 5;
@@ -45,11 +46,6 @@ export class OilCanProjectile {
       return this._splash();
     }
     if (this.y > level.height + 32) this.removed = true;
-  }
-
-  _overlaps(b) {
-    const a = this.box;
-    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   }
 
   _splash() {

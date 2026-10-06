@@ -226,10 +226,9 @@ export class Player extends Entity {
 
   die(fell) {
     if (this.state === 'dead') return;
-    this.state = 'dead';
-    this.hp = 0;
     this._endAttack();
     this.state = 'dead';
+    this.hp = 0;
     this.deathTimer = 0;
     this.fell = fell;
     this.vx = 0;

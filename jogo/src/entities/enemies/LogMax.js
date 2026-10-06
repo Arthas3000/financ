@@ -22,7 +22,6 @@ export class LogMax extends Enemy {
       if (dist < atk.range && sameHeight && this.cooldown <= 0) {
         this.setState('attack');
         this.anim.play('ataque', { restart: true });
-        this.attackId = Symbol('golpe');
         return;
       }
       if (dist > atk.range * 0.7 && this.walk(this.facing, this.def.chaseSpeed, dt)) this.anim.play('correndo');

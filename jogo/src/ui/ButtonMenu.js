@@ -30,7 +30,7 @@ export class ButtonMenu {
     this.t += dt;
     this.blink = Math.max(0, this.blink - dt);
     if (this.locked || this.t < 0.25) return null;
-    const { input, audio } = this.game;
+    const { input } = this.game;
     const n = this.items.length;
 
     if (input.pressed('up')) this._select((this.index - 1 + n) % n);
