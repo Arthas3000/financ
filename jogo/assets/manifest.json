@@ -1,0 +1,244 @@
+{
+  "_leia": "Fonte única de verdade dos assets. O jogo carrega tudo daqui; tools/gerar_assets.py usa estas dimensões para criar placeholders e gerar ASSETS.md. status: 'final' = arte/som já pronto (menu), 'provisorio' = placeholder para você substituir. Sprites são tiras horizontais: N quadros lado a lado, todos do mesmo tamanho 'quadro' [largura, altura]. Personagens/inimigos: olhando para a DIREITA, pés na última linha de pixels, centralizados em x = largura/2.",
+  "dados": ["fontes/fonte.json"],
+  "imagens": [
+    {
+      "grupo": "Fontes (tipografia pixelada)",
+      "itens": [
+        {"arquivo": "fontes/fonte_branca.png", "situacao": "Fonte pixelada 5x7 com contorno — branca", "status": "final", "boot": true},
+        {"arquivo": "fontes/fonte_amarela.png", "situacao": "Fonte pixelada — amarela (destaques)", "status": "final", "boot": true},
+        {"arquivo": "fontes/fonte_vermelha.png", "situacao": "Fonte pixelada — vermelha (alertas)", "status": "final", "boot": true},
+        {"arquivo": "fontes/fonte_ciano.png", "situacao": "Fonte pixelada — ciano (informações)", "status": "final", "boot": true},
+        {"arquivo": "fontes/fonte_cinza.png", "situacao": "Fonte pixelada — cinza (desativado)", "status": "final", "boot": true},
+        {"arquivo": "fontes/fonte_metal.png", "situacao": "Fonte pixelada — gradiente metálico (títulos estilo fliperama)", "status": "final", "boot": true}
+      ]
+    },
+    {
+      "grupo": "Interface — Menus",
+      "itens": [
+        {"arquivo": "ui/carregando_moldura.png", "tamanho": [128, 10], "situacao": "Moldura da barra de carregamento", "status": "final", "boot": true},
+        {"arquivo": "ui/carregando_barra.png", "tamanho": [124, 6], "situacao": "Preenchimento da barra de carregamento", "status": "final", "boot": true},
+        {"arquivo": "ui/logo.png", "tamanho": [320, 112], "situacao": "Logo do jogo (tela inicial)", "status": "final"},
+        {"arquivo": "ui/vinheta.png", "tamanho": [384, 216], "situacao": "Escurecimento das bordas sobre o fundo da tela inicial", "status": "final"},
+        {"arquivo": "ui/botao.png", "tamanho": [128, 20], "situacao": "Botão de menu — normal", "status": "final"},
+        {"arquivo": "ui/botao_selecionado.png", "situacao": "Botão de menu — selecionado (brilho correndo)", "quadro": [128, 20], "quadros": 6, "fps": 12, "loop": true, "status": "final"},
+        {"arquivo": "ui/cursor.png", "situacao": "Cursor/seta de seleção (pulsando)", "quadro": [16, 16], "quadros": 4, "fps": 10, "loop": true, "status": "final"},
+        {"arquivo": "ui/painel.png", "tamanho": [24, 24], "situacao": "Painel genérico 9-slice (pausa, confirmação). Bordas de 8 px", "status": "final"},
+        {"arquivo": "ui/faixa.png", "tamanho": [384, 40], "situacao": "Faixa/banner de anúncio (FASE 1, MISSÃO COMPLETA...)", "status": "final"},
+        {"arquivo": "ui/selecao_fundo.png", "tamanho": [384, 216], "situacao": "Fundo da tela de seleção de personagens", "status": "final"},
+        {"arquivo": "ui/card.png", "tamanho": [116, 152], "situacao": "Card de personagem — normal", "status": "final"},
+        {"arquivo": "ui/card_selecionado.png", "situacao": "Card de personagem — selecionado (piscando)", "quadro": [116, 152], "quadros": 2, "fps": 6, "loop": true, "status": "final"},
+        {"arquivo": "ui/retrato_samurai_jeff.png", "tamanho": [64, 64], "situacao": "Retrato do Samurai Jeff (seleção)", "status": "final"},
+        {"arquivo": "ui/retrato_kanka.png", "tamanho": [64, 64], "situacao": "Retrato do Kanka (seleção)", "status": "final"},
+        {"arquivo": "ui/retrato_paulinho.png", "tamanho": [64, 64], "situacao": "Retrato do Paulinho (seleção)", "status": "final"},
+        {"arquivo": "ui/icone_sabre_oregon.png", "tamanho": [32, 16], "situacao": "Ícone da arma: Sabre da Oregon", "status": "final"},
+        {"arquivo": "ui/icone_ferramentas.png", "tamanho": [32, 16], "situacao": "Ícone da arma: ferramentas arremessáveis", "status": "final"},
+        {"arquivo": "ui/icone_chave_engenheiro.png", "tamanho": [32, 16], "situacao": "Ícone da arma: Chave de Engenheiro", "status": "final"},
+        {"arquivo": "ui/status_cheio.png", "tamanho": [8, 6], "situacao": "Segmento de barra de status — cheio", "status": "final"},
+        {"arquivo": "ui/status_vazio.png", "tamanho": [8, 6], "situacao": "Segmento de barra de status — vazio", "status": "final"}
+      ]
+    },
+    {
+      "grupo": "HUD (durante a fase)",
+      "itens": [
+        {"arquivo": "hud/moldura_retrato.png", "tamanho": [24, 24], "situacao": "Moldura do retrato no canto da tela", "status": "provisorio"},
+        {"arquivo": "hud/retrato_samurai_jeff.png", "tamanho": [20, 20], "situacao": "Retrato pequeno do Samurai Jeff", "status": "provisorio"},
+        {"arquivo": "hud/retrato_kanka.png", "tamanho": [20, 20], "situacao": "Retrato pequeno do Kanka", "status": "provisorio"},
+        {"arquivo": "hud/retrato_paulinho.png", "tamanho": [20, 20], "situacao": "Retrato pequeno do Paulinho", "status": "provisorio"},
+        {"arquivo": "hud/barra_vida.png", "tamanho": [10, 62], "situacao": "Moldura vertical da barra de vida (estilo Mega Man, 28 marcas)", "status": "provisorio"},
+        {"arquivo": "hud/vida_cheia.png", "tamanho": [6, 1], "situacao": "Marca de vida cheia", "status": "provisorio"},
+        {"arquivo": "hud/vida_vazia.png", "tamanho": [6, 1], "situacao": "Marca de vida vazia", "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Personagem — Samurai Jeff (corpo a corpo)",
+      "itens": [
+        {"arquivo": "personagens/samurai_jeff/parado.png", "situacao": "Parado (respirando)", "quadro": [64, 64], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/correndo.png", "situacao": "Correndo/andando", "quadro": [64, 64], "quadros": 8, "fps": 14, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/pulo.png", "situacao": "Pulo (subindo)", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/queda.png", "situacao": "Caindo", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/aterrissagem.png", "situacao": "Aterrissando (agacha rápido)", "quadro": [64, 64], "quadros": 2, "fps": 20, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/ataque.png", "situacao": "Golpe 1 do sabre (de cima para baixo). Quadros 1–3 causam dano", "quadro": [64, 64], "quadros": 6, "fps": 18, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/ataque_2.png", "situacao": "Golpe 2 do combo (de baixo para cima). Quadros 1–3 causam dano", "quadro": [64, 64], "quadros": 6, "fps": 18, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/ataque_ar.png", "situacao": "Giro com o sabre no ar. Quadros 1–3 causam dano", "quadro": [64, 64], "quadros": 5, "fps": 18, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/dano.png", "situacao": "Tomando dano", "quadro": [64, 64], "quadros": 2, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/morte.png", "situacao": "Morrendo (cai no chão)", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/samurai_jeff/vitoria.png", "situacao": "Comemorando (fim de fase / personagem escolhido)", "quadro": [64, 64], "quadros": 4, "fps": 8, "loop": true, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Personagem — Kanka (à distância)",
+      "itens": [
+        {"arquivo": "personagens/kanka/parado.png", "situacao": "Parado (respirando)", "quadro": [64, 64], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/correndo.png", "situacao": "Correndo/andando", "quadro": [64, 64], "quadros": 8, "fps": 14, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/pulo.png", "situacao": "Pulo (subindo)", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/queda.png", "situacao": "Caindo", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/aterrissagem.png", "situacao": "Aterrissando", "quadro": [64, 64], "quadros": 2, "fps": 20, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/arremesso.png", "situacao": "Arremessando ferramenta no chão. A ferramenta sai no quadro 1", "quadro": [64, 64], "quadros": 4, "fps": 16, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/arremesso_ar.png", "situacao": "Arremessando ferramenta no ar. A ferramenta sai no quadro 1", "quadro": [64, 64], "quadros": 4, "fps": 16, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/dano.png", "situacao": "Tomando dano", "quadro": [64, 64], "quadros": 2, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/morte.png", "situacao": "Morrendo", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/kanka/vitoria.png", "situacao": "Comemorando", "quadro": [64, 64], "quadros": 4, "fps": 8, "loop": true, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Personagem — Paulinho (armas pesadas)",
+      "itens": [
+        {"arquivo": "personagens/paulinho/parado.png", "situacao": "Parado (respirando, barriga mexendo)", "quadro": [64, 64], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/correndo.png", "situacao": "Correndo/andando (pesado)", "quadro": [64, 64], "quadros": 8, "fps": 12, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/pulo.png", "situacao": "Pulo (subindo)", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/queda.png", "situacao": "Caindo", "quadro": [64, 64], "quadros": 2, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/aterrissagem.png", "situacao": "Aterrissando (impacto pesado)", "quadro": [64, 64], "quadros": 2, "fps": 16, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/ataque.png", "situacao": "Marretada com a chave de engenheiro. 0–3 preparação, 4–5 dano + tremor, 6–7 recuperação", "quadro": [64, 64], "quadros": 8, "fps": 14, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/ataque_ar.png", "situacao": "Golpe com a chave no ar. Quadros 2–3 causam dano", "quadro": [64, 64], "quadros": 6, "fps": 14, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/dano.png", "situacao": "Tomando dano", "quadro": [64, 64], "quadros": 2, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/morte.png", "situacao": "Morrendo", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": false, "status": "provisorio"},
+        {"arquivo": "personagens/paulinho/vitoria.png", "situacao": "Comemorando", "quadro": [64, 64], "quadros": 4, "fps": 8, "loop": true, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Inimigo — Mecânico LogMax (fase 1, corpo a corpo)",
+      "itens": [
+        {"arquivo": "inimigos/logmax/parado.png", "situacao": "Parado", "quadro": [64, 64], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/andando.png", "situacao": "Andando (patrulha)", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/correndo.png", "situacao": "Correndo atrás do jogador", "quadro": [64, 64], "quadros": 6, "fps": 14, "loop": true, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/alerta.png", "situacao": "Percebeu o jogador (susto)", "quadro": [64, 64], "quadros": 2, "fps": 8, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/ataque.png", "situacao": "Golpe com ferramenta. 0–1 aviso, 2–3 dano, 4–5 recuperação", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/dano.png", "situacao": "Tomando dano", "quadro": [64, 64], "quadros": 2, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/logmax/morte.png", "situacao": "Derrotado", "quadro": [64, 64], "quadros": 6, "fps": 12, "loop": false, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Inimigo — Mecânico Ponssee (fase 2, à distância)",
+      "itens": [
+        {"arquivo": "inimigos/ponssee/parado.png", "situacao": "Parado", "quadro": [64, 64], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "inimigos/ponssee/andando.png", "situacao": "Andando (patrulha / recuando)", "quadro": [64, 64], "quadros": 6, "fps": 10, "loop": true, "status": "provisorio"},
+        {"arquivo": "inimigos/ponssee/alerta.png", "situacao": "Percebeu o jogador", "quadro": [64, 64], "quadros": 2, "fps": 8, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/ponssee/arremesso.png", "situacao": "Arremessando lata de óleo. A lata sai no quadro 2", "quadro": [64, 64], "quadros": 5, "fps": 10, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/ponssee/dano.png", "situacao": "Tomando dano", "quadro": [64, 64], "quadros": 2, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "inimigos/ponssee/morte.png", "situacao": "Derrotado", "quadro": [64, 64], "quadros": 6, "fps": 12, "loop": false, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Objetos / Projéteis (girados por código, desenhe apontando para a direita)",
+      "itens": [
+        {"arquivo": "projeteis/chave_de_boca.png", "tamanho": [16, 16], "situacao": "Chave de boca arremessada (Kanka)", "status": "provisorio"},
+        {"arquivo": "projeteis/parafuso.png", "tamanho": [16, 16], "situacao": "Parafuso arremessado (Kanka)", "status": "provisorio"},
+        {"arquivo": "projeteis/porca.png", "tamanho": [16, 16], "situacao": "Porca arremessada (Kanka)", "status": "provisorio"},
+        {"arquivo": "projeteis/arruela.png", "tamanho": [16, 16], "situacao": "Arruela arremessada (Kanka)", "status": "provisorio"},
+        {"arquivo": "projeteis/lata_oleo.png", "tamanho": [16, 16], "situacao": "Lata de óleo arremessada (inimigo Ponssee)", "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Efeitos visuais",
+      "itens": [
+        {"arquivo": "efeitos/poeira_pulo.png", "situacao": "Poeira ao pular", "quadro": [32, 16], "quadros": 5, "fps": 20, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/poeira_aterrissagem.png", "situacao": "Poeira ao aterrissar", "quadro": [32, 16], "quadros": 5, "fps": 20, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/faisca_acerto.png", "situacao": "Faísca de golpe acertando inimigo", "quadro": [32, 32], "quadros": 4, "fps": 24, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/faisca_metal.png", "situacao": "Faísca de ferramenta quicando no chão", "quadro": [16, 16], "quadros": 3, "fps": 24, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/serragem.png", "situacao": "Partícula de serragem/lasca (sabre acertando)", "quadro": [8, 8], "quadros": 4, "fps": 12, "loop": true, "status": "provisorio"},
+        {"arquivo": "efeitos/onda_impacto.png", "situacao": "Onda de impacto no chão (marretada do Paulinho)", "quadro": [64, 32], "quadros": 5, "fps": 20, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/explosao_orbe.png", "situacao": "Orbe da explosão de derrota (estilo Mega Man)", "quadro": [16, 16], "quadros": 4, "fps": 16, "loop": true, "status": "provisorio"},
+        {"arquivo": "efeitos/fumaca.png", "situacao": "Fumaça ao inimigo sumir", "quadro": [48, 48], "quadros": 6, "fps": 16, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/respingo_oleo.png", "situacao": "Respingo da lata de óleo no chão", "quadro": [32, 16], "quadros": 5, "fps": 16, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/brilho_item.png", "situacao": "Brilho ao pegar item / checkpoint", "quadro": [16, 16], "quadros": 4, "fps": 12, "loop": false, "status": "provisorio"},
+        {"arquivo": "efeitos/alerta.png", "situacao": "Exclamação “!” sobre o inimigo que te viu", "quadro": [16, 16], "quadros": 2, "fps": 8, "loop": true, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Itens e marcadores de fase",
+      "itens": [
+        {"arquivo": "itens/marmita.png", "situacao": "Marmita — recupera vida", "quadro": [16, 16], "quadros": 4, "fps": 6, "loop": true, "status": "provisorio"},
+        {"arquivo": "itens/checkpoint_inativo.png", "tamanho": [32, 48], "situacao": "Placa de checkpoint — ainda não ativada", "status": "provisorio"},
+        {"arquivo": "itens/checkpoint_ativo.png", "situacao": "Placa de checkpoint — ativada", "quadro": [32, 48], "quadros": 4, "fps": 8, "loop": true, "status": "provisorio"},
+        {"arquivo": "itens/fim_de_fase.png", "situacao": "Bandeira/placa de SAÍDA (fim da fase)", "quadro": [32, 64], "quadros": 4, "fps": 8, "loop": true, "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Cenário — Fase 1: Floresta de Pinus",
+      "itens": [
+        {"arquivo": "cenarios/fase1/parallax_0_ceu.png", "tamanho": [384, 240], "situacao": "Fundo: céu (fixo). Emenda horizontal perfeita", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/parallax_1_montanhas.png", "tamanho": [384, 240], "situacao": "Fundo: montanhas (move 10% da câmera)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/parallax_2_arvores_longe.png", "tamanho": [384, 240], "situacao": "Fundo: pinheiros distantes (25%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/parallax_3_arvores_meio.png", "tamanho": [384, 240], "situacao": "Fundo: pinheiros médios (45%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/parallax_4_arvores_perto.png", "tamanho": [384, 240], "situacao": "Fundo: troncos de pinus próximos (70%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/parallax_5_primeiro_plano.png", "tamanho": [384, 240], "situacao": "Primeiro plano: mato na frente do jogador (125%). Quase todo transparente", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/tileset.png", "tamanho": [64, 64], "situacao": "Blocos 16x16 da fase (grade 4x4 — ver tabela de tiles)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/arvore.png", "tamanho": [48, 176], "situacao": "Decoração: tronco de pinus alto atrás do jogador (letra t)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/arbusto.png", "tamanho": [32, 16], "situacao": "Decoração: arbusto (letra a)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/samambaia.png", "tamanho": [32, 24], "situacao": "Decoração: samambaia (letra s)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/pedra.png", "tamanho": [24, 16], "situacao": "Decoração: pedra (letra r)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/cogumelo.png", "tamanho": [16, 16], "situacao": "Decoração: cogumelos (letra c)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase1/placa.png", "tamanho": [32, 32], "situacao": "Decoração: placa de madeira com seta (letra p)", "status": "provisorio"}
+      ]
+    },
+    {
+      "grupo": "Cenário — Fase 2: Floresta de Eucalipto",
+      "itens": [
+        {"arquivo": "cenarios/fase2/parallax_0_ceu.png", "tamanho": [384, 240], "situacao": "Fundo: céu de fim de tarde (fixo)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/parallax_1_montanhas.png", "tamanho": [384, 240], "situacao": "Fundo: morros (10%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/parallax_2_arvores_longe.png", "tamanho": [384, 240], "situacao": "Fundo: eucaliptos distantes (25%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/parallax_3_arvores_meio.png", "tamanho": [384, 240], "situacao": "Fundo: eucaliptos médios (45%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/parallax_4_arvores_perto.png", "tamanho": [384, 240], "situacao": "Fundo: troncos claros de eucalipto próximos (70%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/parallax_5_primeiro_plano.png", "tamanho": [384, 240], "situacao": "Primeiro plano: folhas/cascas na frente do jogador (125%)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/tileset.png", "tamanho": [64, 64], "situacao": "Blocos 16x16 da fase 2 (mesma grade da fase 1)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/arvore.png", "tamanho": [48, 176], "situacao": "Decoração: tronco de eucalipto alto (letra t)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/arbusto.png", "tamanho": [32, 16], "situacao": "Decoração: arbusto (letra a)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/samambaia.png", "tamanho": [32, 24], "situacao": "Decoração: capim/folhagem (letra s)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/pedra.png", "tamanho": [24, 16], "situacao": "Decoração: pedra (letra r)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/cogumelo.png", "tamanho": [16, 16], "situacao": "Decoração: casca de eucalipto caída (letra c)", "status": "provisorio"},
+        {"arquivo": "cenarios/fase2/placa.png", "tamanho": [32, 32], "situacao": "Decoração: placa com seta (letra p)", "status": "provisorio"}
+      ]
+    }
+  ],
+  "audio": [
+    {
+      "grupo": "Música",
+      "itens": [
+        {"arquivo": "audio/musica/titulo.wav", "situacao": "Tela inicial (loop)", "volume": 0.55, "loop": true, "status": "final"},
+        {"arquivo": "audio/musica/selecao.wav", "situacao": "Seleção de personagem / continuar (loop)", "volume": 0.55, "loop": true, "status": "final"},
+        {"arquivo": "audio/musica/fase1.wav", "situacao": "Fase 1 — Floresta de Pinus (loop)", "volume": 0.45, "loop": true, "status": "provisorio"},
+        {"arquivo": "audio/musica/fase2.wav", "situacao": "Fase 2 — Floresta de Eucalipto (loop)", "volume": 0.45, "loop": true, "status": "provisorio"},
+        {"arquivo": "audio/musica/vitoria.wav", "situacao": "Vinheta de fase completa", "volume": 0.6, "loop": false, "status": "final"},
+        {"arquivo": "audio/musica/game_over.wav", "situacao": "Vinheta de fim de jogo", "volume": 0.6, "loop": false, "status": "final"},
+        {"arquivo": "audio/musica/final.wav", "situacao": "Tela final / créditos (loop)", "volume": 0.5, "loop": true, "status": "final"}
+      ]
+    },
+    {
+      "grupo": "Efeitos sonoros — Menus",
+      "itens": [
+        {"arquivo": "audio/sfx/ui_mover.wav", "situacao": "Mover cursor", "volume": 0.5, "status": "final"},
+        {"arquivo": "audio/sfx/ui_confirmar.wav", "situacao": "Confirmar opção", "volume": 0.6, "status": "final"},
+        {"arquivo": "audio/sfx/ui_voltar.wav", "situacao": "Voltar/cancelar", "volume": 0.5, "status": "final"},
+        {"arquivo": "audio/sfx/ui_ficha.wav", "situacao": "Inserir ficha (PRESSIONE START)", "volume": 0.6, "status": "final"},
+        {"arquivo": "audio/sfx/ui_tique.wav", "situacao": "Tique do cronômetro", "volume": 0.5, "status": "final"},
+        {"arquivo": "audio/sfx/ui_pronto.wav", "situacao": "Personagem escolhido", "volume": 0.7, "status": "final"},
+        {"arquivo": "audio/sfx/ui_anuncio.wav", "situacao": "Faixa de anúncio entrando (FASE 1 / VAI!)", "volume": 0.6, "status": "final"}
+      ]
+    },
+    {
+      "grupo": "Efeitos sonoros — Jogo",
+      "itens": [
+        {"arquivo": "audio/sfx/pulo.wav", "situacao": "Pulo", "volume": 0.4, "status": "provisorio"},
+        {"arquivo": "audio/sfx/aterrissar.wav", "situacao": "Aterrissar", "volume": 0.35, "status": "provisorio"},
+        {"arquivo": "audio/sfx/sabre_ataque.wav", "situacao": "Sabre da Oregon girando (motosserra)", "volume": 0.45, "status": "provisorio"},
+        {"arquivo": "audio/sfx/sabre_acerto.wav", "situacao": "Corrente do sabre cortando", "volume": 0.45, "status": "provisorio"},
+        {"arquivo": "audio/sfx/arremesso.wav", "situacao": "Ferramenta arremessada", "volume": 0.4, "status": "provisorio"},
+        {"arquivo": "audio/sfx/ferramenta_quica.wav", "situacao": "Ferramenta quicando no chão (tlim)", "volume": 0.35, "status": "provisorio"},
+        {"arquivo": "audio/sfx/ferramenta_acerto.wav", "situacao": "Ferramenta acertando inimigo", "volume": 0.5, "status": "provisorio"},
+        {"arquivo": "audio/sfx/chave_giro.wav", "situacao": "Chave de engenheiro girando (pesado)", "volume": 0.5, "status": "provisorio"},
+        {"arquivo": "audio/sfx/chave_impacto.wav", "situacao": "Chave de engenheiro batendo no chão/inimigo", "volume": 0.7, "status": "provisorio"},
+        {"arquivo": "audio/sfx/inimigo_dano.wav", "situacao": "Inimigo tomando dano", "volume": 0.45, "status": "provisorio"},
+        {"arquivo": "audio/sfx/inimigo_morte.wav", "situacao": "Inimigo derrotado (explosão)", "volume": 0.55, "status": "provisorio"},
+        {"arquivo": "audio/sfx/inimigo_alerta.wav", "situacao": "Inimigo percebeu o jogador", "volume": 0.4, "status": "provisorio"},
+        {"arquivo": "audio/sfx/inimigo_golpe.wav", "situacao": "Golpe do LogMax", "volume": 0.5, "status": "provisorio"},
+        {"arquivo": "audio/sfx/lata_arremesso.wav", "situacao": "Ponssee arremessando lata", "volume": 0.45, "status": "provisorio"},
+        {"arquivo": "audio/sfx/lata_respingo.wav", "situacao": "Lata de óleo estourando", "volume": 0.45, "status": "provisorio"},
+        {"arquivo": "audio/sfx/jogador_dano.wav", "situacao": "Jogador tomando dano", "volume": 0.6, "status": "provisorio"},
+        {"arquivo": "audio/sfx/jogador_morte.wav", "situacao": "Jogador derrotado", "volume": 0.6, "status": "provisorio"},
+        {"arquivo": "audio/sfx/item.wav", "situacao": "Pegar marmita", "volume": 0.55, "status": "provisorio"},
+        {"arquivo": "audio/sfx/checkpoint.wav", "situacao": "Checkpoint ativado", "volume": 0.55, "status": "provisorio"}
+      ]
+    }
+  ]
+}
