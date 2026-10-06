@@ -190,7 +190,7 @@ details.how[open] summary svg{transform:rotate(90deg)}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
   box-shadow:0 -.5px 0 var(--sep);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabbar .in{max-width:680px;margin:0 auto;height:49px;display:grid;grid-template-columns:repeat(5,1fr)}
-.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:500;letter-spacing:.1px;color:var(--cash)}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:500;letter-spacing:.1px;color:var(--cash);white-space:nowrap}
 .tab svg{width:26px;height:26px}
 .tab[aria-current="page"]{color:var(--tint)}
 .tab.add{color:var(--tint)}
@@ -231,7 +231,7 @@ body.sheet-open .sheet{transform:none}
   <button class="tab" data-tab="inicio"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.3 2.8a1 1 0 0 1 1.4 0l8.4 8a1 1 0 0 1-.7 1.7H19V20a1.5 1.5 0 0 1-1.5 1.5H15v-5.5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H6.5A1.5 1.5 0 0 1 5 20v-7.5H3.9a1 1 0 0 1-.7-1.7l8.1-8Z"/></svg>Início</button>
   <button class="tab" data-tab="rf"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.6 2.1a1 1 0 0 1 .8 0l8.5 4a.9.9 0 0 1-.4 1.7H3.5a.9.9 0 0 1-.4-1.7l8.5-4ZM5 9.5h2.5V17H5Zm5.75 0h2.5V17h-2.5Zm5.75 0H19V17h-2.5ZM3 18.5h18a1 1 0 0 1 1 1v.5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-.5a1 1 0 0 1 1-1Z"/></svg>Renda fixa</button>
   <button class="tab add" data-tab="aportar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5a1 1 0 0 0-1 1v3H8a1 1 0 0 0 0 2h3v3a1 1 0 0 0 2 0v-3h3a1 1 0 0 0 0-2h-3V8a1 1 0 0 0-1-1Z"/></svg>Aportar</button>
-  <button class="tab" data-tab="rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.5 9 11l4 4 8-9"/><path d="M15.5 6H21v5.5"/></svg>Renda variável</button>
+  <button class="tab" data-tab="rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.5 9 11l4 4 8-9"/><path d="M15.5 6H21v5.5"/></svg>Variável</button>
   <button class="tab" data-tab="simular"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a2.5 2.5 0 0 1 2.5 2.5v15A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5v-15A2.5 2.5 0 0 1 7 2Zm1 3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Zm0 7.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm-8 4.4a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/></svg>Simular</button>
 </div></nav>
 
@@ -376,7 +376,7 @@ function simulate(p, V0, A, n, pr){
 
 
 /* ===================== Estado e persistência ===================== */
-const PREFS = { shortcut:"Carteira Widget", autoWidget:false, badge:false };
+const PREFS = { badge:false };
 function mergeDefaults(s){
   const d = clone(DEFAULTS);
   if (!s || typeof s !== "object") return { ...d, prefs:{ ...PREFS } };
@@ -396,41 +396,7 @@ function localLoad(){ try { const t = localStorage.getItem(LKEY); return t ? JSO
 function localSave(){ try { localStorage.setItem(LKEY, JSON.stringify(S)); } catch(e){} }
 let S = mergeDefaults(localLoad());
 
-/* sincronização opcional quando aberto dentro do Claude */
-const remote = { ref:null, writing:false, pending:false, mode:"local", timer:null };
-function scheduleRemote(){ clearTimeout(remote.timer); remote.timer = setTimeout(flushRemote, 700); }
-async function flushRemote(){
-  if (!remote.ref) return;
-  if (remote.writing){ remote.pending = true; return; }
-  remote.writing = true;
-  try { await remote.ref.set({ json: JSON.stringify(S), updatedAt: S.updatedAt }); remote.mode = "sync"; }
-  catch(e){ if (e && ["invalid_argument","revoked","not_granted"].includes(e.code)){ remote.ref = null; remote.mode = "local"; } }
-  remote.writing = false;
-  if (remote.pending){ remote.pending = false; flushRemote(); }
-}
-(async function initRemote(){
-  try {
-    if (!window.claude || typeof window.claude.use !== "function") return;
-    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
-    if (!db || !user) return;
-    const id = await user.id(); if (!id) return;
-    const ref = db.doc("data/users/" + id + "/carteira"); remote.ref = ref;
-    const snap = await ref.get();
-    if (snap.exists){
-      const d = snap.data();
-      if ((d.updatedAt || 0) >= (S.updatedAt || 0) && d.json){ S = mergeDefaults(JSON.parse(d.json)); localSave(); render(); }
-      else if (S.updatedAt) flushRemote();
-    } else if (S.updatedAt) flushRemote();
-    remote.mode = "sync";
-    ref.onSnapshot(sn => {
-      if (!sn.exists || sn.metadata.hasPendingWrites) return;
-      const d = sn.data();
-      if (d && d.json && (d.updatedAt || 0) > (S.updatedAt || 0)){ S = mergeDefaults(JSON.parse(d.json)); localSave(); render(); }
-    }, () => {});
-    if (tab === "ajustes") render();
-  } catch(e){ remote.ref = null; remote.mode = "local"; }
-})();
-function commit(msg){ S.updatedAt = Date.now(); localSave(); scheduleRemote(); render(); if (msg) toast(msg); }
+function commit(msg){ S.updatedAt = Date.now(); localSave(); render(); if (msg) toast(msg); }
 
 /* ===================== Carteira ===================== */
 function findAsset(code){
@@ -475,7 +441,6 @@ const ICON = {
   more:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m4 2 4 4-4 4"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5a1 1 0 0 0-1 1v3H8a1 1 0 0 0 0 2h3v3a1 1 0 0 0 2 0v-3h3a1 1 0 0 0 0-2h-3V8a1 1 0 0 0-1-1Z"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-  widget:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.2"/><rect x="13" y="3" width="8" height="8" rx="2.2"/><rect x="3" y="13" width="18" height="8" rx="2.2"/></svg>',
   bell:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2Zm7-6V11a7 7 0 0 0-5.5-6.8V3.5a1.5 1.5 0 0 0-3 0v.7A7 7 0 0 0 5 11v5l-1.6 1.6a.8.8 0 0 0 .6 1.4h16a.8.8 0 0 0 .6-1.4Z"/></svg>'
 };
 const section = (header, body, footer, fcls = "") =>
@@ -758,8 +723,7 @@ function viewAportar(P){
   const r = draft.result;
   return bar + `<div class="section"><div class="list empty"><div class="done">${ICON.check}</div><h3>Aporte registrado</h3>
     <p>${brl(r.valor)} em ${fmtDate(r.data)}. ${brl(r.aplicado)} aplicados em ${r.n} ${r.n === 1 ? "ativo" : "ativos"}${r.caixa > 0.009 ? `, ${brl(r.caixa)} em caixa` : ""}.</p>
-    <button class="btn" data-act="goHome">Ver início</button>
-    ${canWidget() ? `<button class="btn gray" style="margin-top:10px" data-act="widget">Atualizar widget</button>` : ""}</div></div>`;
+    <button class="btn" data-act="goHome">Ver início</button></div></div>`;
 }
 function updateAporteSum(){
   const el = $("#aSum"); if (!el) return;
@@ -807,7 +771,6 @@ function simDetail(i){
 
 /* ===================== Ajustes ===================== */
 const standalone = () => window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
-const canWidget = () => { try { return window.top === window.self; } catch(e){ return false; } };
 function viewAjustes(){
   const pr = S.premissas, sRF = S.rf.reduce((s, p) => s + p.aloc, 0), sRV = S.rv.reduce((s, a) => s + a.aloc, 0);
   const pf = (k, label, d = 2) => `<div class="field"><label for="p-${k}">${label}</label><input id="p-${k}" class="num" inputmode="decimal" data-prem="${k}" value="${nfmt(pr[k] * 100, d)}"><span class="muted">%</span></div>`;
@@ -817,20 +780,16 @@ function viewAjustes(){
   h += section("Divisão do aporte", list([`<div class="field" style="display:block;padding:12px 16px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Renda fixa <b id="sRF" class="num">${pct(S.split.rf, 0)}</b></span><span>Variável <b id="sRV" class="num">${pct(1 - S.split.rf, 0)}</b></span></div><input type="range" min="0" max="100" step="5" value="${Math.round(S.split.rf * 100)}" data-split aria-label="Percentual em renda fixa"></div>`]));
   h += section("Alocação na renda fixa", list(al(S.rf, "rf")), `Soma ${pct(sRF, 0)}${off(sRF) ? " — precisa ser 100%" : ""}`, off(sRF) ? "neg" : "");
   h += section("Alocação na renda variável", list(al(S.rv, "rv")), `Soma ${pct(sRV, 0)}${off(sRV) ? " — precisa ser 100%" : ""}`, off(sRV) ? "neg" : "");
-  if (canWidget()){
-    h += section("Widget e Atalhos", list([
-      cell({ t:"Atualizar widget", s:"Envia o resumo para o Scriptable", icon:ICON.widget, iconBg:"var(--tint)", act:"widget" }),
-      `<div class="field"><label for="scName">Nome do atalho</label><input id="scName" data-pref="shortcut" value="${esc(S.prefs.shortcut)}" autocomplete="off"></div>`,
-      `<div class="field"><label for="autoW">Atualizar ao confirmar aporte</label><input type="checkbox" class="switch" id="autoW" data-prefbool="autoWidget" ${S.prefs.autoWidget ? "checked" : ""}></div>`,
-      ...("setAppBadge" in navigator ? [`<div class="field"><label for="bdg">Selo de aporte pendente</label><input type="checkbox" class="switch" id="bdg" data-prefbool="badge" ${S.prefs.badge ? "checked" : ""}></div>`] : [])
-    ]), "O atalho precisa existir no app Atalhos com esse nome exato. Veja o guia de configuração.");
-  }
+  h += section("Lembrete", list([
+    `<a class="textbtn" style="display:block;text-decoration:none" href="lembrete.ics">Adicionar lembrete ao Calendário</a>`,
+    ...("setAppBadge" in navigator ? [`<div class="field"><label for="bdg">Selo de aporte pendente</label><input type="checkbox" class="switch" id="bdg" data-prefbool="badge" ${S.prefs.badge ? "checked" : ""}></div>`] : [])
+  ]), "O Calendário avisa todo mês no 5º dia útil, às 9h. O selo marca o ícone enquanto o aporte do mês não for feito.");
   h += section("Backup", list([
     `<div class="cell" style="display:block"><textarea class="in" id="bkOut" readonly rows="3" aria-label="Backup">${esc(JSON.stringify(S))}</textarea></div>`,
     `<button class="textbtn" data-act="copyBk">Copiar backup</button>`,
     `<div class="cell" style="display:block"><textarea class="in" id="bkIn" rows="3" placeholder="Cole aqui um backup para restaurar" aria-label="Restaurar backup"></textarea></div>`,
     `<button class="textbtn" data-act="restoreBk">Restaurar backup</button>`
-  ]), remote.mode === "sync" ? "Sincronizado com sua conta Claude." : standalone() ? "Salvo neste iPhone. Faça backup de tempos em tempos." : "Salvo neste aparelho.");
+  ]), standalone() ? "Salvo neste iPhone. Faça backup de tempos em tempos." : "Salvo neste aparelho.");
   h += section("", list([`<button class="textbtn red" data-act="wipe">Apagar todos os dados</button>`]), "Informações para estudo, não recomendação de investimento.");
   return h;
 }
@@ -875,20 +834,7 @@ function saveRV(code){
   closeSheet(); commit("Ativo salvo");
 }
 
-/* ===================== Widget, Atalhos e selo ===================== */
-function widgetSummary(){
-  const P = portfolio(), ult = [...S.aportes].sort((a, b) => b.data.localeCompare(a.data))[0];
-  const top = [...P.rvList.map(x => ({ c:x.code, v:x.valor })), ...P.rfList.map(x => ({ c:x.prod ? x.prod.nome : x.code, v:x.liq }))].sort((a, b) => b.v - a.v).slice(0, 3);
-  const r2 = x => Math.round(x * 100) / 100;
-  return { app:"carteira", v:1, at:new Date().toISOString(), total:r2(P.total), depositado:r2(P.depositado), ganho:r2(P.ganho),
-    rf:r2(P.rfLiq), rv:r2(P.rvValor), caixa:r2(Math.max(0, P.caixa)), renda:r2(P.renda), aportes:S.aportes.length,
-    mes:monthKey(), aportouMes:aportouNoMes(), ultimo: ult ? { data:ult.data, valor:ult.valor } : null,
-    top:top.map(t => ({ c:t.c, v:r2(t.v) })), premissas:S.premissas };
-}
-function sendWidget(){
-  const url = "shortcuts://run-shortcut?name=" + encodeURIComponent(S.prefs.shortcut || PREFS.shortcut) + "&input=text&text=" + encodeURIComponent(JSON.stringify(widgetSummary()));
-  window.location.href = url;
-}
+/* ===================== Selo ===================== */
 let lastBadge = null;
 function updateBadge(){
   if (!S.prefs.badge || !("setAppBadge" in navigator)) return;
@@ -905,15 +851,6 @@ async function enableBadge(on){
   commit(on ? "Selo ativado" : "Selo desativado");
 }
 
-/* atalhos de URL: ?aba=aportar&valor=500 ou ?aporte=500 */
-(function readURL(){
-  const q = new URLSearchParams(location.search);
-  const aba = q.get("aba") || q.get("tab"), val = q.get("aporte") || q.get("valor");
-  if (val){ resetDraft(); draft.valor = val; tab = "aportar"; }
-  else if (aba && TITLES[aba]) tab = aba;
-  if ((aba || val) && history.replaceState) history.replaceState(null, "", location.pathname);
-})();
-
 /* ===================== Eventos ===================== */
 function bindView(){
   main.querySelectorAll("[data-sim]").forEach(el => el.onchange = () => {
@@ -929,14 +866,11 @@ function bindView(){
     const v = parseNum(el.value); if (!isFinite(v) || v < 0 || v > 100){ toast("Use de 0 a 100"); render(); return; }
     const a = (el.dataset.aloc === "rf" ? S.rf : S.rv).find(x => x.code === el.dataset.code); if (a){ a.aloc = v / 100; commit(); }
   });
-  main.querySelectorAll("[data-pref]").forEach(el => el.onchange = () => { S.prefs[el.dataset.pref] = el.value.trim() || PREFS[el.dataset.pref]; commit("Salvo"); });
-  main.querySelectorAll("[data-prefbool]").forEach(el => el.onchange = () => {
-    if (el.dataset.prefbool === "badge") enableBadge(el.checked); else { S.prefs[el.dataset.prefbool] = el.checked; commit(); }
-  });
+  main.querySelectorAll("[data-prefbool]").forEach(el => el.onchange = () => enableBadge(el.checked));
   const split = main.querySelector("#aSplit, [data-split]");
   if (split){
     split.oninput = () => { $("#sRF").textContent = split.value + "%"; $("#sRV").textContent = (100 - split.value) + "%"; };
-    split.onchange = () => { S.split.rf = split.value / 100; S.updatedAt = Date.now(); localSave(); scheduleRemote(); if (tab === "ajustes") render(); };
+    split.onchange = () => { S.split.rf = split.value / 100; S.updatedAt = Date.now(); localSave(); if (tab === "ajustes") render(); };
   }
   ["aValor","aData","aSaldo"].forEach(id => { const el = $("#" + id); if (el) el.oninput = el.onchange = () => {
     draft.valor = $("#aValor").value; draft.data = $("#aData").value; const s = $("#aSaldo"); draft.saldo = s ? s.checked : false; }; });
@@ -952,7 +886,6 @@ const ACTIONS = {
   simDet: b => simDetail(+b.dataset.i), prices: pricesSheet,
   editRF: b => editRFSheet(b.dataset.code), newRF: () => editRFSheet(null), editRV: b => editRVSheet(b.dataset.code), newRV: () => editRVSheet(null),
   rvFilter: b => { rvFilter = b.dataset.k; render(); },
-  widget: sendWidget,
   toStep1: () => { step = 1; render(); },
   toStep2: () => {
     const v = parseNum(draft.valor), pf = portfolio(), saldo = draft.saldo && pf.caixa > 0.009 ? pf.caixa : 0, val = isFinite(v) ? v : 0;
@@ -972,7 +905,6 @@ const ACTIONS = {
     for (const l of bought) S.compras.push({ id:uid("c"), data:draft.data, code:l.code, classe:l.classe, qtd:l.qtd, preco:l.preco, aporteId });
     draft.result = { valor:draft.valorNum, data:draft.data, aplicado:tot, n:bought.length, caixa:draft.base - tot };
     step = 3; commit("Aporte registrado");
-    if (S.prefs.autoWidget && canWidget()) setTimeout(sendWidget, 900);
   },
   delAporte: b => { if (!confirm("Apagar este aporte e as compras ligadas a ele?")) return; const id = b.dataset.id;
     S.aportes = S.aportes.filter(a => a.id !== id); S.compras = S.compras.filter(c => c.aporteId !== id); closeSheet(); commit("Aporte apagado"); },
