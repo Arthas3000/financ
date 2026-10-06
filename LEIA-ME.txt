@@ -1,0 +1,31 @@
+CARTEIRA — app para iPhone com widget e Atalhos
+
+1) INSTALAR O APP (offline)
+   Envie para o GitHub Pages (ou Netlify Drop): index.html, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png.
+   Abra o endereço no Safari > Compartilhar > Adicionar à Tela de Início. Abra uma vez com internet.
+   Já usa uma versão anterior? Basta substituir o index.html e o sw.js no GitHub; seus dados continuam no iPhone.
+
+2) SCRIPTABLE (widget)
+   Instale o Scriptable (App Store, gratuito). Toque em +, cole o conteúdo de Carteira.js e renomeie o script para: Carteira
+
+3) ATALHO OBRIGATÓRIO: "Carteira Widget"
+   App Atalhos > + > Adicionar ação > Scriptable > Run Script
+     Script: Carteira   |   Parameter: Entrada do Atalho   |   desligue "Run In App"
+   Adicione "Mostrar notificação" com o Resultado do Script (opcional).
+   Nomeie o atalho exatamente: Carteira Widget
+   No app Carteira: Ajustes > Atualizar widget. Na primeira vez, permita que o atalho rode.
+
+4) WIDGET
+   Tela de Início: segure > Editar > Adicionar widget > Scriptable > pequeno ou médio > toque no widget > Script: Carteira
+   Tela Bloqueada: segure > Personalizar > Tela Bloqueada > widgets > Scriptable (retangular, circular ou em linha) > Script: Carteira
+
+5) ATALHOS PARA SIRI (opcionais)
+   "Resumo da carteira": Run Script (Carteira, Parameter: texto "resumo") > Falar Texto (Resultado do Script)
+   "Simular aplicação": Pedir Entrada (Número) "Quanto?" > Pedir Entrada (Número) "Quantos meses?" >
+       Texto "simular [Entrada 1] [Entrada 2]" > Run Script (Carteira, Parameter: Texto) > Mostrar Resultado
+
+6) AUTOMAÇÃO MENSAL (opcional)
+   Atalhos > Automação > Nova > Hora do Dia > Mensalmente, dia 5, 9h > Executar Imediatamente
+   Ação: Mostrar notificação "Hora do aporte do mês"
+
+Os dados ficam só no iPhone. Faça backup em Ajustes > Backup de tempos em tempos.

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Carteira">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Carteira</title>
+<style>
+/* ============ Tokens (cores do sistema iOS) ============ */
+:root{
+  --bg:#F2F2F7; --cell:#FFFFFF; --label:#000000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.29); --fill:rgba(118,118,128,.12); --fill2:rgba(118,118,128,.2);
+  --tint:#007AFF; --green:#34C759; --red:#FF3B30; --rf:#5856D6; --rv:#FF9500; --cash:#8E8E93;
+  --bar:rgba(249,249,249,.86); --scrim:rgba(0,0,0,.35);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",Roboto,sans-serif;
+  --rounded:ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --cell:#1C1C1E; --label:#FFFFFF; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
+    --sep:rgba(84,84,88,.6); --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
+    --tint:#0A84FF; --green:#30D158; --red:#FF453A; --rf:#5E5CE6; --rv:#FF9F0A; --cash:#98989D;
+    --bar:rgba(22,22,24,.82); --scrim:rgba(0,0,0,.5); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --cell:#1C1C1E; --label:#FFFFFF; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.6); --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
+  --tint:#0A84FF; --green:#30D158; --red:#FF453A; --rf:#5E5CE6; --rv:#FF9F0A; --cash:#98989D;
+  --bar:rgba(22,22,24,.82); --scrim:rgba(0,0,0,.5); color-scheme:dark;
+}
+
+/* ============ Base ============ */
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 52px);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--label);font:17px/1.29 var(--font);letter-spacing:-.41px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;-webkit-user-select:none;user-select:none}
+:focus-visible{outline:3px solid var(--tint);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums}
+.pos{color:var(--green)} .neg{color:var(--red)} .muted{color:var(--label2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+
+/* ============ Barra de navegação ============ */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:30;padding-top:env(safe-area-inset-top,0px);
+  background:transparent;transition:background .2s, box-shadow .2s}
+.navbar.solid{background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 .5px 0 var(--sep)}
+.navbar .in{max-width:680px;margin:0 auto;height:44px;display:grid;grid-template-columns:88px 1fr 88px;align-items:center;padding:0 8px}
+.navbar .ttl{text-align:center;font-weight:600;opacity:0;transition:opacity .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navbar.solid .ttl{opacity:1}
+.navbtn{justify-self:end;background:none;border:0;color:var(--tint);padding:8px;display:grid;place-items:center;border-radius:50%}
+.navbtn svg{width:24px;height:24px}
+.navbtn.left{justify-self:start;font-size:17px;display:flex;gap:2px;align-items:center;padding:8px 4px}
+
+/* ============ Conteúdo ============ */
+#main{max-width:680px;margin:0 auto;padding:44px 0 calc(100px + env(safe-area-inset-bottom,0px));
+  transform-origin:50% 0;transition:transform .35s cubic-bezier(.32,.72,0,1), filter .35s, border-radius .35s}
+body.sheet-open #main{transform:scale(.94) translateY(8px);filter:brightness(.92);border-radius:12px}
+.page{animation:pageIn .22s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.largetitle{font-size:34px;line-height:41px;font-weight:700;letter-spacing:.37px;margin:4px 20px 10px}
+.section{margin:0 16px 28px}
+.sh{font-size:13px;line-height:18px;color:var(--label2);margin:0 16px 7px;letter-spacing:-.08px}
+.sf{font-size:13px;line-height:18px;color:var(--label2);margin:7px 16px 0;letter-spacing:-.08px}
+.sf.neg{color:var(--red)}
+
+/* lista agrupada inserida */
+.list{background:var(--cell);border-radius:10px;overflow:hidden}
+.cell{position:relative;display:flex;align-items:center;gap:12px;min-height:44px;padding:11px 16px;width:100%;
+  background:none;border:0;text-align:left}
+.cell + .cell::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.cell.ind + .cell::before,.cell.ind::before{left:58px}
+button.cell:active{background:var(--fill2)}
+.cell .ic{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;color:#fff}
+.cell .ic svg{width:18px;height:18px}
+.cell .tx{flex:1;min-width:0}
+.cell .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .s{font-size:15px;color:var(--label2);letter-spacing:-.24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .v{text-align:right;flex-shrink:0;color:var(--label2)}
+.cell .v.strong{color:var(--label);font-weight:600}
+.cell .v small{display:block;font-size:13px;letter-spacing:-.08px}
+.chev{width:8px;height:13px;flex-shrink:0;color:var(--label3)}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--fill);color:var(--label2);margin-left:6px;vertical-align:1px;letter-spacing:0}
+
+/* cartão de resumo */
+.summary{background:var(--cell);border-radius:10px;padding:16px}
+.summary .k{font-size:15px;color:var(--label2);font-weight:500}
+.summary .big{font-family:var(--rounded);font-size:40px;line-height:46px;font-weight:700;letter-spacing:-.5px;margin:2px 0}
+.summary .d{font-size:15px;font-weight:600}
+.stack{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--fill);margin:14px 0 10px;gap:2px}
+.stack span{height:100%;border-radius:2px;transition:flex-grow .5s cubic-bezier(.32,.72,0,1)}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:13px;color:var(--label2)}
+.legend b{display:block;color:var(--label);font-size:15px;font-weight:600;font-family:var(--rounded)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--cell);border-radius:10px;padding:12px 14px}
+.tile .k{font-size:13px;color:var(--label2)}
+.tile .v{font-family:var(--rounded);font-size:22px;font-weight:700;letter-spacing:-.3px}
+
+/* botões */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border:0;border-radius:12px;
+  background:var(--tint);color:#fff;font-size:17px;font-weight:600;padding:0 16px;transition:opacity .15s, transform .15s}
+.btn:active{opacity:.7;transform:scale(.98)}
+.btn.gray{background:var(--fill);color:var(--tint)}
+.btn.red{background:var(--fill);color:var(--red)}
+.btn[disabled]{opacity:.4}
+.btnrow{display:flex;gap:10px}
+.textbtn{background:none;border:0;color:var(--tint);font-size:17px;padding:11px 16px;width:100%;text-align:left}
+.textbtn.red{color:var(--red)}
+
+/* campos */
+.field{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 16px;position:relative}
+.field + .field::before,.cell + .field::before,.field + .cell::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.field label{flex:1;min-width:0}
+.field input,.field select{border:0;background:none;text-align:right;outline:none;min-width:0;width:50%;color:var(--label2);font-size:17px}
+.field input:focus{color:var(--label)}
+.field select{direction:rtl}
+.amount{display:block;width:100%;border:0;background:none;text-align:center;font-family:var(--rounded);font-size:48px;font-weight:700;padding:18px 8px 8px;outline:none;letter-spacing:-.5px}
+textarea.in{width:100%;border:0;background:var(--fill);border-radius:8px;padding:8px;font-size:12px;resize:vertical;min-height:64px}
+
+/* switch iOS */
+.switch{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:16px;background:var(--fill2);position:relative;flex-shrink:0;transition:background .25s;margin:0;cursor:pointer}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.switch:checked{background:var(--green)}
+.switch:checked::after{transform:translateX(20px)}
+
+/* controle segmentado */
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;position:relative}
+.seg button{flex:1;border:0;background:none;border-radius:7px;padding:6px 8px;font-size:13px;font-weight:500;letter-spacing:-.08px;position:relative;z-index:1}
+.seg button[aria-pressed="true"]{background:var(--cell);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+
+/* slider */
+input[type=range]{width:100%;accent-color:var(--tint);margin:0}
+
+/* stepper */
+.stepper{display:flex;background:var(--fill);border-radius:8px;overflow:hidden;flex-shrink:0}
+.stepper button{width:44px;height:32px;border:0;background:none;font-size:22px;line-height:1;color:var(--label)}
+.stepper button + button{border-left:.5px solid var(--sep)}
+.stepper button:active{background:var(--fill2)}
+.qty{width:64px;border:0;background:var(--fill);border-radius:8px;height:32px;text-align:center;font-weight:600}
+.pricein{width:96px;border:0;background:var(--fill);border-radius:8px;height:32px;text-align:right;padding:0 8px}
+.warn{font-size:13px;color:var(--red);margin-top:2px}
+
+/* passos */
+.progress{display:flex;gap:6px;margin:0 20px 18px}
+.progress i{flex:1;height:4px;border-radius:2px;background:var(--fill2);transition:background .3s}
+.progress i.on{background:var(--tint)}
+
+/* gráfico */
+.chart{background:var(--cell);border-radius:10px;padding:12px 12px 6px}
+.chart svg{display:block;width:100%;height:auto}
+
+/* vazio e sucesso */
+.empty{text-align:center;padding:28px 24px}
+.empty .ic{width:56px;height:56px;border-radius:14px;background:var(--fill);display:grid;place-items:center;margin:0 auto 12px;color:var(--tint)}
+.empty .ic svg{width:30px;height:30px}
+.empty h3{margin:0 0 6px;font-size:20px;font-weight:600}
+.empty p{margin:0 0 16px;color:var(--label2);font-size:15px}
+.done{width:72px;height:72px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin:8px auto 14px;animation:pop .45s cubic-bezier(.3,1.5,.5,1) both}
+.done svg{width:38px;height:38px;stroke:#fff;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .4s .25s ease forwards}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* simulador */
+.rank{width:24px;height:24px;border-radius:50%;background:var(--fill);font-size:13px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+.rank.first{background:var(--green);color:#fff}
+.meter{height:4px;border-radius:2px;background:var(--fill);margin-top:6px;overflow:hidden}
+.meter span{display:block;height:100%;border-radius:2px}
+
+/* fórmulas */
+details.how{background:var(--cell);border-radius:10px}
+details.how summary{list-style:none;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 16px;color:var(--tint);cursor:pointer}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary svg{width:12px;height:12px;transition:transform .2s}
+details.how[open] summary svg{transform:rotate(90deg)}
+.fx{padding:0 16px 14px;font-size:15px;letter-spacing:-.24px}
+.fx p{margin:0 0 10px}
+.eq{display:block;margin-top:4px;padding:8px 10px;border-radius:8px;background:var(--fill);font-variant-numeric:tabular-nums}
+
+/* barra de abas */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:0 -.5px 0 var(--sep);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar .in{max-width:680px;margin:0 auto;height:49px;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:10px;font-weight:500;letter-spacing:.1px;color:var(--cash)}
+.tab svg{width:26px;height:26px}
+.tab[aria-current="page"]{color:var(--tint)}
+.tab.add{color:var(--tint)}
+.tab.add svg{width:30px;height:30px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .3s}
+body.sheet-open .scrim{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:680px;margin:0 auto;max-height:calc(100% - env(safe-area-inset-top,0px) - 10px);
+  display:flex;flex-direction:column;background:var(--bg);border-radius:12px 12px 0 0;transform:translateY(100%);transition:transform .38s cubic-bezier(.32,.72,0,1)}
+body.sheet-open .sheet{transform:none}
+.sheet .grab{width:36px;height:5px;border-radius:3px;background:var(--fill2);margin:6px auto 0;flex-shrink:0}
+.sheet .head{display:grid;grid-template-columns:96px 1fr 96px;align-items:center;height:48px;padding:0 8px;flex-shrink:0}
+.sheet .head .ttl{text-align:center;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .head button{background:none;border:0;color:var(--tint);font-size:17px;padding:8px}
+.sheet .head .r{justify-self:end;font-weight:600}
+.sheet .head .l{justify-self:start}
+.sheet .body{overflow:auto;padding:6px 0 calc(24px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translate(-50%,-140%);z-index:50;
+  background:var(--cell);color:var(--label);padding:10px 18px;border-radius:999px;font-size:15px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.18);
+  transition:transform .4s cubic-bezier(.32,.72,0,1);display:flex;gap:8px;align-items:center;max-width:90vw}
+.toast.on{transform:translate(-50%,0)}
+.toast svg{width:18px;height:18px;color:var(--green)}
+
+@media (min-width:700px){ .largetitle{margin-left:4px} .section{margin-left:0;margin-right:0} #main{padding-left:16px;padding-right:16px} }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<header class="navbar" id="navbar"><div class="in">
+  <span></span><div class="ttl" id="navTitle">Carteira</div>
+  <button class="navbtn" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2Zm8.1-2.5a8.4 8.4 0 0 0 0-2.2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.8 7.8 0 0 0-1.9-1.1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5c-.7.3-1.3.7-1.9 1.1l-2.4-1a.5.5 0 0 0-.6.2L1.6 8.7a.5.5 0 0 0 .1.6l2 1.6a8.4 8.4 0 0 0 0 2.2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.6.4 1.2.8 1.9 1.1l.4 2.5c0 .2.3.4.5.4h3.8c.2 0 .5-.2.5-.4l.4-2.5c.7-.3 1.3-.7 1.9-1.1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6l-2-1.6Z"/></svg></button>
+</div></header>
+
+<main id="main"></main>
+
+<nav class="tabbar" aria-label="Seções"><div class="in">
+  <button class="tab" data-tab="inicio"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.3 2.8a1 1 0 0 1 1.4 0l8.4 8a1 1 0 0 1-.7 1.7H19V20a1.5 1.5 0 0 1-1.5 1.5H15v-5.5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H6.5A1.5 1.5 0 0 1 5 20v-7.5H3.9a1 1 0 0 1-.7-1.7l8.1-8Z"/></svg>Início</button>
+  <button class="tab" data-tab="rf"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.6 2.1a1 1 0 0 1 .8 0l8.5 4a.9.9 0 0 1-.4 1.7H3.5a.9.9 0 0 1-.4-1.7l8.5-4ZM5 9.5h2.5V17H5Zm5.75 0h2.5V17h-2.5Zm5.75 0H19V17h-2.5ZM3 18.5h18a1 1 0 0 1 1 1v.5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-.5a1 1 0 0 1 1-1Z"/></svg>Renda fixa</button>
+  <button class="tab add" data-tab="aportar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5a1 1 0 0 0-1 1v3H8a1 1 0 0 0 0 2h3v3a1 1 0 0 0 2 0v-3h3a1 1 0 0 0 0-2h-3V8a1 1 0 0 0-1-1Z"/></svg>Aportar</button>
+  <button class="tab" data-tab="rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.5 9 11l4 4 8-9"/><path d="M15.5 6H21v5.5"/></svg>Renda variável</button>
+  <button class="tab" data-tab="simular"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a2.5 2.5 0 0 1 2.5 2.5v15A2.5 2.5 0 0 1 17 22H7a2.5 2.5 0 0 1-2.5-2.5v-15A2.5 2.5 0 0 1 7 2Zm1 3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Zm0 7.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm-8 4.4a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Zm4 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/></svg>Simular</button>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <div class="head"><button class="l" id="sheetLeft">Fechar</button><div class="ttl" id="sheetTitle"></div><button class="r" id="sheetRight" hidden></button></div>
+  <div class="body" id="sheetBody"></div>
+</section>
+<div class="toast" id="toast" role="status"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm4.3 6.3-5.3 5.3-2.3-2.3a1 1 0 1 0-1.4 1.4l3 3a1 1 0 0 0 1.4 0l6-6a1 1 0 1 0-1.4-1.4Z"/></svg><span></span></div>
+
+<script>
+"use strict";
+/* ===================== Dados padrão ===================== */
+const DEFAULTS = {
+  v: 1, updatedAt: 0,
+  premissas: { cdi: 0.1365, selic: 0.1375, ipca: 0.042, tr: 0.0015 },
+  split: { rf: 0.8 },
+  sim: { v0: 2000, a: 0, n: 12 },
+  rf: [
+    { code:"CDB-SOFISA", nome:"CDB Sofisa Direto", tipo:"CDB", liq:"Diária", idx:"cdi", taxa:1.05, isento:false, min:1, preco:null, aloc:1, obs:"" },
+    { code:"CDB-NEON", nome:"CDB Neon", tipo:"CDB", liq:"Diária", idx:"cdi", taxa:1.08, isento:false, min:1, preco:null, aloc:0, obs:"Escalonado de 100% a 113%; 108% é uma média estimada." },
+    { code:"CDB-DAYCOVAL", nome:"CDB Daycoval", tipo:"CDB", liq:"Diária", idx:"cdi", taxa:1.04, isento:false, min:1000, preco:null, aloc:0, obs:"" },
+    { code:"CDB-C6", nome:"CDB C6 Bank", tipo:"CDB", liq:"Diária", idx:"cdi", taxa:1.02, isento:false, min:20, preco:null, aloc:0, obs:"" },
+    { code:"TESOURO-SELIC", nome:"Tesouro Selic", tipo:"Tesouro", liq:"D+1", idx:"selic", taxa:1.00, isento:false, min:1, preco:null, aloc:0, obs:"Custódia isenta até R$ 10 mil." },
+    { code:"TESOURO-PRE-2029", nome:"Tesouro Prefixado 2029", tipo:"Tesouro", liq:"D+1 a preço de mercado", idx:"pre", taxa:0.1372, isento:false, min:7.48, preco:748.80, aloc:0, obs:"Taxa garantida só no vencimento (01/01/2029)." }
+  ],
+  rv: [
+    { code:"KNCR11", nome:"Kinea Rendimentos", tipo:"FII de papel", setor:"Recebíveis (CDI)", dy:0.1277, preco:107.93, aloc:0.5, risco:"Médio" },
+    { code:"HGCR11", nome:"CSHG Recebíveis", tipo:"FII de papel", setor:"Recebíveis", dy:0.1259, preco:null, aloc:0, risco:"Médio" },
+    { code:"RBRR11", nome:"RBR High Grade", tipo:"FII de papel", setor:"Recebíveis (IPCA)", dy:0.119, preco:null, aloc:0, risco:"Médio" },
+    { code:"GARE11", nome:"Guardian Real Estate", tipo:"FII híbrido", setor:"Imóveis variados", dy:0.1137, preco:null, aloc:0, risco:"Médio" },
+    { code:"HSML11", nome:"HSI Malls", tipo:"FII de tijolo", setor:"Shoppings", dy:0.1063, preco:null, aloc:0, risco:"Médio a alto" },
+    { code:"PMLL11", nome:"Patria Malls", tipo:"FII de tijolo", setor:"Shoppings", dy:0.103, preco:null, aloc:0, risco:"Médio a alto" },
+    { code:"PETR4", nome:"Petrobras", tipo:"Ação", setor:"Petróleo e gás", dy:0.1172, preco:45.02, aloc:0.25, risco:"Alto" },
+    { code:"ALOS3", nome:"Allos", tipo:"Ação", setor:"Shoppings", dy:0.1306, preco:null, aloc:0, risco:"Alto" },
+    { code:"VALE3", nome:"Vale", tipo:"Ação", setor:"Mineração", dy:0.1010, preco:77.70, aloc:0, risco:"Alto" },
+    { code:"CPLE3", nome:"Copel", tipo:"Ação", setor:"Energia elétrica", dy:0.0949, preco:null, aloc:0, risco:"Médio a alto" },
+    { code:"ITUB4", nome:"Itaú Unibanco", tipo:"Ação", setor:"Bancos", dy:0.0829, preco:39.55, aloc:0.25, risco:"Médio a alto" },
+    { code:"BBDC4", nome:"Bradesco", tipo:"Ação", setor:"Bancos", dy:0.101, preco:null, aloc:0, risco:"Alto" }
+  ],
+  aportes: [], compras: []
+};
+const SIM_PRODUCTS = [
+  { nome:"CDB 100% do CDI", idx:"cdi", taxa:1.00, isento:false, custo:0, liq:"Diária" },
+  { nome:"CDB 105% do CDI", idx:"cdi", taxa:1.05, isento:false, custo:0, liq:"Diária" },
+  { nome:"CDB 110% do CDI", idx:"cdi", taxa:1.10, isento:false, custo:0, liq:"Diária" },
+  { nome:"CDB 115% do CDI", idx:"cdi", taxa:1.15, isento:false, custo:0, liq:"Geralmente com carência" },
+  { nome:"LCI/LCA 90% do CDI", idx:"cdi", taxa:0.90, isento:true, custo:0, liq:"Carência" },
+  { nome:"LCI/LCA 95% do CDI", idx:"cdi", taxa:0.95, isento:true, custo:0, liq:"Carência" },
+  { nome:"CDB prefixado 13,8%", idx:"pre", taxa:0.138, isento:false, custo:0, liq:"No vencimento" },
+  { nome:"CDB IPCA + 6,55%", idx:"ipca", taxa:0.0655, isento:false, custo:0, liq:"No vencimento" },
+  { nome:"CDB IPCA + 7,65%", idx:"ipca", taxa:0.0765, isento:false, custo:0, liq:"No vencimento" },
+  { nome:"Tesouro Selic", idx:"selic", taxa:1.00, isento:false, custo:0, liq:"D+1", ref:true },
+  { nome:"Tesouro Prefixado 2029", idx:"pre", taxa:0.1372, isento:false, custo:0.002, liq:"D+1 a preço de mercado" },
+  { nome:"Tesouro IPCA+ (≈ 7,35%)", idx:"ipca", taxa:0.0735, isento:false, custo:0.002, liq:"D+1 a preço de mercado" },
+  { nome:"Poupança", idx:"poup", taxa:0.005, isento:true, custo:0, liq:"Diária (rende no aniversário)" }
+];
+const IOF = [96,93,90,86,83,80,76,73,70,66,63,60,56,53,50,46,43,40,36,33,30,26,23,20,16,13,10,6,3];
+const LKEY = "carteira-app-v1";
+
+/* ===================== Utilidades ===================== */
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const BRL = new Intl.NumberFormat("pt-BR", { style:"currency", currency:"BRL" });
+const brl = x => BRL.format(isFinite(x) ? x : 0);
+const pct = (x, d = 2) => (isFinite(x) ? x * 100 : 0).toLocaleString("pt-BR", { minimumFractionDigits:d, maximumFractionDigits:d }) + "%";
+const nfmt = (x, d = 2) => (isFinite(x) ? x : 0).toLocaleString("pt-BR", { minimumFractionDigits:0, maximumFractionDigits:d });
+function parseNum(v){
+  if (typeof v === "number") return v;
+  let s = String(v || "").trim().replace(/\s|R\$|%/g, "");
+  if (!s) return NaN;
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  return Number(s);
+}
+const todayISO = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+const toDate = iso => { const [y,m,d] = String(iso).split("-").map(Number); return new Date(y, (m||1)-1, d||1); };
+const daysBetween = (a, b) => Math.round((toDate(b) - toDate(a)) / 86400000);
+const fmtDate = iso => toDate(iso).toLocaleDateString("pt-BR");
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+/* ===================== Cálculos ===================== */
+function annualRate(p, pr){
+  switch (p.idx){
+    case "cdi": return p.taxa * pr.cdi;
+    case "selic": return p.taxa * pr.selic;
+    case "pre": return p.taxa;
+    case "ipca": return (1 + pr.ipca) * (1 + p.taxa) - 1;
+    case "poup": return Math.pow(1 + p.taxa + pr.tr, 12) - 1;
+    default: return 0;
+  }
+}
+function rateLabel(p){
+  switch (p.idx){
+    case "cdi": return pct(p.taxa, 0) + " do CDI";
+    case "selic": return pct(p.taxa, 0) + " da Selic";
+    case "pre": return pct(p.taxa) + " a.a. prefixado";
+    case "ipca": return "IPCA + " + pct(p.taxa);
+    case "poup": return "0,5% a.m. + TR";
+    default: return "";
+  }
+}
+const irRate = d => d <= 180 ? 0.225 : d <= 360 ? 0.20 : d <= 720 ? 0.175 : 0.15;
+const iofRate = d => d >= 30 ? 0 : IOF[Math.max(d,1) - 1] / 100;
+
+/* valor de uma aplicação de renda fixa hoje */
+function calcRF(c, prod, pr, today){
+  const A = c.qtd * c.preco;
+  const d = Math.max(0, daysBetween(c.data, today));
+  if (!prod) return { A, d, r:0, bruto:A, rend:0, iof:0, ir:0, aliq:0, liq:A, missing:true };
+  const r = annualRate(prod, pr);
+  let bruto;
+  if (prod.idx === "poup") bruto = A * Math.pow(1 + prod.taxa + pr.tr, Math.floor(d / 30.4375));
+  else bruto = A * Math.pow(1 + r - (prod.custo || 0), d / 365);
+  const rend = bruto - A;
+  const iof = (!prod.isento && rend > 0) ? rend * iofRate(d) : 0;
+  const aliq = prod.isento ? 0 : irRate(d);
+  const ir = Math.max(0, rend - iof) * aliq;
+  return { A, d, r, bruto, rend, iof, ir, aliq, liq: bruto - iof - ir };
+}
+
+/* simulador: aplicação inicial + aportes mensais; cada aporte com seu prazo de IR */
+function simulate(p, V0, A, n, pr){
+  const r = annualRate(p, pr) - (p.custo || 0);
+  const i = Math.pow(1 + r, 1/12) - 1;
+  let bruto = V0 * Math.pow(1 + i, n), inv = V0, ir = 0;
+  if (!p.isento) ir += (bruto - V0) * irRate(n * 365 / 12);
+  for (let k = 1; k <= n; k++){
+    const h = n - k, v = A * Math.pow(1 + i, h);
+    bruto += v; inv += A;
+    if (!p.isento) ir += (v - A) * irRate(h * 365 / 12);
+  }
+  const liq = bruto - ir;
+  const t = irRate(n * 365 / 12), Yg = Math.pow(1 + i, n) - 1;
+  const Y = p.isento ? Yg : Yg * (1 - t);
+  const taxaLiq = Math.pow(1 + Y, 12 / n) - 1;
+  const eqCDB = (Math.pow(1 + Y / (1 - t), 12 / n) - 1) / pr.cdi;
+  const eqLCI = taxaLiq / pr.cdi;
+  return { r, i, inv, bruto, ir, liq, rend: liq - inv, taxaLiq, eqCDB, eqLCI, t };
+}
+
+
+
+/* ===================== Estado e persistência ===================== */
+const PREFS = { shortcut:"Carteira Widget", autoWidget:false, badge:false };
+function mergeDefaults(s){
+  const d = clone(DEFAULTS);
+  if (!s || typeof s !== "object") return { ...d, prefs:{ ...PREFS } };
+  return {
+    ...d, ...s,
+    premissas: { ...d.premissas, ...(s.premissas || {}) },
+    split: { ...d.split, ...(s.split || {}) },
+    sim: { ...d.sim, ...(s.sim || {}) },
+    prefs: { ...PREFS, ...(s.prefs || {}) },
+    rf: Array.isArray(s.rf) ? s.rf : d.rf,
+    rv: Array.isArray(s.rv) ? s.rv : d.rv,
+    aportes: Array.isArray(s.aportes) ? s.aportes : [],
+    compras: Array.isArray(s.compras) ? s.compras : []
+  };
+}
+function localLoad(){ try { const t = localStorage.getItem(LKEY); return t ? JSON.parse(t) : null; } catch(e){ return null; } }
+function localSave(){ try { localStorage.setItem(LKEY, JSON.stringify(S)); } catch(e){} }
+let S = mergeDefaults(localLoad());
+
+/* sincronização opcional quando aberto dentro do Claude */
+const remote = { ref:null, writing:false, pending:false, mode:"local", timer:null };
+function scheduleRemote(){ clearTimeout(remote.timer); remote.timer = setTimeout(flushRemote, 700); }
+async function flushRemote(){
+  if (!remote.ref) return;
+  if (remote.writing){ remote.pending = true; return; }
+  remote.writing = true;
+  try { await remote.ref.set({ json: JSON.stringify(S), updatedAt: S.updatedAt }); remote.mode = "sync"; }
+  catch(e){ if (e && ["invalid_argument","revoked","not_granted"].includes(e.code)){ remote.ref = null; remote.mode = "local"; } }
+  remote.writing = false;
+  if (remote.pending){ remote.pending = false; flushRemote(); }
+}
+(async function initRemote(){
+  try {
+    if (!window.claude || typeof window.claude.use !== "function") return;
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    const id = await user.id(); if (!id) return;
+    const ref = db.doc("data/users/" + id + "/carteira"); remote.ref = ref;
+    const snap = await ref.get();
+    if (snap.exists){
+      const d = snap.data();
+      if ((d.updatedAt || 0) >= (S.updatedAt || 0) && d.json){ S = mergeDefaults(JSON.parse(d.json)); localSave(); render(); }
+      else if (S.updatedAt) flushRemote();
+    } else if (S.updatedAt) flushRemote();
+    remote.mode = "sync";
+    ref.onSnapshot(sn => {
+      if (!sn.exists || sn.metadata.hasPendingWrites) return;
+      const d = sn.data();
+      if (d && d.json && (d.updatedAt || 0) > (S.updatedAt || 0)){ S = mergeDefaults(JSON.parse(d.json)); localSave(); render(); }
+    }, () => {});
+    if (tab === "ajustes") render();
+  } catch(e){ remote.ref = null; remote.mode = "local"; }
+})();
+function commit(msg){ S.updatedAt = Date.now(); localSave(); scheduleRemote(); render(); if (msg) toast(msg); }
+
+/* ===================== Carteira ===================== */
+function findAsset(code){
+  const a = S.rf.find(x => x.code === code); if (a) return { classe:"rf", a };
+  const b = S.rv.find(x => x.code === code); if (b) return { classe:"rv", a:b };
+  return null;
+}
+function portfolio(){
+  const today = todayISO(), pr = S.premissas, rfMap = {}, rvMap = {};
+  let rfApl = 0, rfLiq = 0, rfIR = 0, rfIOF = 0, rfMensal = 0;
+  for (const c of S.compras){
+    if (c.classe === "rf"){
+      const prod = S.rf.find(x => x.code === c.code), k = calcRF(c, prod, pr, today);
+      const h = rfMap[c.code] ||= { code:c.code, prod, itens:[], A:0, liq:0 };
+      h.itens.push({ c, k }); h.A += k.A; h.liq += k.liq;
+      rfApl += k.A; rfLiq += k.liq; rfIR += k.ir; rfIOF += k.iof;
+      if (prod){ const im = Math.pow(1 + annualRate(prod, pr) - (prod.custo || 0), 1/12) - 1; rfMensal += k.bruto * im * (prod.isento ? 1 : 1 - irRate(Math.max(k.d, 1))); }
+    } else {
+      const h = rvMap[c.code] ||= { code:c.code, a:S.rv.find(x => x.code === c.code), qtd:0, custo:0, itens:[] };
+      h.qtd += c.qtd; h.custo += c.qtd * c.preco; h.itens.push(c);
+    }
+  }
+  let rvCusto = 0, rvValor = 0, rvMensal = 0;
+  const rvList = Object.values(rvMap).map(h => {
+    const p = h.a && h.a.preco > 0 ? h.a.preco : null, valor = p ? h.qtd * p : h.custo;
+    const renda = h.a ? valor * (h.a.dy || 0) : 0;
+    rvCusto += h.custo; rvValor += valor; rvMensal += renda / 12;
+    return { ...h, p, valor, pm: h.qtd > 0 ? h.custo / h.qtd : 0, lp: valor - h.custo, renda };
+  });
+  const depositado = S.aportes.reduce((s, a) => s + a.valor, 0);
+  const gasto = S.compras.reduce((s, c) => s + c.qtd * c.preco, 0);
+  const caixa = depositado - gasto, total = rfLiq + rvValor + Math.max(0, caixa);
+  return { rfList:Object.values(rfMap), rfApl, rfLiq, rfIR, rfIOF, rfMensal, rvList, rvCusto, rvValor, rvMensal,
+           depositado, gasto, caixa, total, ganho: total - depositado, renda: rfMensal + rvMensal };
+}
+const monthKey = () => todayISO().slice(0,7);
+const aportouNoMes = () => S.aportes.some(a => a.data.slice(0,7) === monthKey());
+
+/* ===================== Componentes ===================== */
+const ICON = {
+  chev:'<svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1.5 1.5 5 5-5 5"/></svg>',
+  more:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m4 2 4 4-4 4"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 5a1 1 0 0 0-1 1v3H8a1 1 0 0 0 0 2h3v3a1 1 0 0 0 2 0v-3h3a1 1 0 0 0 0-2h-3V8a1 1 0 0 0-1-1Z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  widget:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.2"/><rect x="13" y="3" width="8" height="8" rx="2.2"/><rect x="3" y="13" width="18" height="8" rx="2.2"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2Zm7-6V11a7 7 0 0 0-5.5-6.8V3.5a1.5 1.5 0 0 0-3 0v.7A7 7 0 0 0 5 11v5l-1.6 1.6a.8.8 0 0 0 .6 1.4h16a.8.8 0 0 0 .6-1.4Z"/></svg>'
+};
+const section = (header, body, footer, fcls = "") =>
+  `<div class="section">${header ? `<div class="sh">${header}</div>` : ""}${body}${footer ? `<div class="sf ${fcls}">${footer}</div>` : ""}</div>`;
+const list = rows => `<div class="list">${rows.join("")}</div>`;
+function cell({ t, s, v, vs, act, data = {}, icon, iconBg, strong, chev = !!act, vcls = "" }){
+  const attrs = Object.entries(data).map(([k, x]) => ` data-${k}="${esc(x)}"`).join("");
+  const tag = act ? "button" : "div";
+  return `<${tag} class="cell${icon ? " ind" : ""}"${act ? ` data-act="${act}"` : ""}${attrs}>
+    ${icon ? `<span class="ic" style="background:${iconBg}">${icon}</span>` : ""}
+    <span class="tx"><span class="t">${t}</span>${s ? `<span class="s" style="display:block">${s}</span>` : ""}</span>
+    ${v !== undefined ? `<span class="v num ${strong ? "strong" : ""} ${vcls}">${v}${vs ? `<small class="${vcls}">${vs}</small>` : ""}</span>` : ""}
+    ${chev ? ICON.chev : ""}</${tag}>`;
+}
+const signed = x => (x >= 0 ? "+" : "−") + brl(Math.abs(x));
+const how = (title, paras) => `<details class="how"><summary>${title}${ICON.more}</summary><div class="fx">${paras.join("")}</div></details>`;
+const P_ = (txt, eq) => `<p>${txt}${eq !== undefined ? `<span class="eq">${eq}</span>` : ""}</p>`;
+
+/* ===================== Shell ===================== */
+let tab = "inicio";
+const TITLES = { inicio:"Carteira", rf:"Renda fixa", aportar:"Novo aporte", rv:"Renda variável", simular:"Simulador", ajustes:"Ajustes" };
+const $ = s => document.querySelector(s);
+const main = $("#main");
+let toastT;
+function toast(t){ const el = $("#toast"); el.querySelector("span").textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 2000); }
+
+let sheetHandlers = {};
+function openSheet({ title, body, left = "Fechar", right = null }){
+  $("#sheetTitle").textContent = title || "";
+  $("#sheetLeft").textContent = left;
+  const r = $("#sheetRight"); r.hidden = !right; if (right){ r.textContent = right.label; sheetHandlers.right = right.act; }
+  $("#sheetBody").innerHTML = body; $("#sheetBody").scrollTop = 0;
+  document.body.classList.add("sheet-open");
+}
+function closeSheet(){ document.body.classList.remove("sheet-open"); sheetHandlers = {}; }
+$("#sheetLeft").onclick = closeSheet; $("#scrim").onclick = closeSheet;
+$("#sheetRight").onclick = () => sheetHandlers.right && sheetHandlers.right();
+/* arrastar para fechar */
+(() => {
+  const sh = $("#sheet"); let y0 = null, dy = 0;
+  sh.addEventListener("touchstart", e => { if ($("#sheetBody").scrollTop > 0 && !e.target.closest(".grab,.head")) return; y0 = e.touches[0].clientY; dy = 0; sh.style.transition = "none"; }, { passive:true });
+  sh.addEventListener("touchmove", e => { if (y0 === null) return; dy = Math.max(0, e.touches[0].clientY - y0); sh.style.transform = `translateY(${dy}px)`; }, { passive:true });
+  sh.addEventListener("touchend", () => { if (y0 === null) return; sh.style.transition = ""; sh.style.transform = ""; if (dy > 110) closeSheet(); y0 = null; });
+})();
+
+function go(t){ tab = t; window.scrollTo(0, 0); render(); }
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => { if (b.dataset.tab === "aportar" && tab !== "aportar") resetDraft(); go(b.dataset.tab); });
+$("#gear").onclick = () => go("ajustes");
+
+/* título grande que vira título compacto ao rolar */
+let titleObs;
+function watchTitle(){
+  titleObs && titleObs.disconnect();
+  const lt = $(".largetitle"); if (!lt) return;
+  titleObs = new IntersectionObserver(([e]) => $("#navbar").classList.toggle("solid", !e.isIntersecting), { rootMargin:"-44px 0px 0px 0px" });
+  titleObs.observe(lt);
+}
+
+function render(){
+  $("#navTitle").textContent = TITLES[tab];
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-current", b.dataset.tab === tab ? "page" : "false"));
+  const P = portfolio();
+  const views = { inicio:viewInicio, rf:viewRF, aportar:viewAportar, rv:viewRV, simular:viewSimular, ajustes:viewAjustes };
+  main.innerHTML = `<div class="page"><h1 class="largetitle">${TITLES[tab]}</h1>${views[tab](P)}</div>`;
+  bindView(); watchTitle(); updateBadge();
+}
+
+/* ===================== Início ===================== */
+function viewInicio(P){
+  const parts = [["Renda fixa", P.rfLiq, "var(--rf)"], ["Variável", P.rvValor, "var(--rv)"], ["Caixa", Math.max(0, P.caixa), "var(--cash)"]];
+  const tot = parts.reduce((s, p) => s + p[1], 0);
+  const gp = P.depositado > 0 ? P.ganho / P.depositado : 0;
+  let h = `<div class="section"><div class="summary">
+    <div class="k">Patrimônio estimado</div>
+    <div class="big num">${brl(P.total)}</div>
+    <div class="d num ${P.ganho >= 0 ? "pos" : "neg"}">${P.depositado > 0 ? `${signed(P.ganho)} (${pct(gp)})` : `<span class="muted">Nenhum aporte ainda</span>`}</div>
+    <div class="stack">${tot > 0 ? parts.filter(p => p[1] > 0).map(p => `<span style="flex-grow:${p[1]};background:${p[2]}"></span>`).join("") : ""}</div>
+    <div class="legend">${parts.map(p => `<div><span class="dot" style="background:${p[2]}"></span>${p[0]}<b class="num">${brl(p[1])}</b></div>`).join("")}</div>
+  </div></div>`;
+  if (!S.aportes.length){
+    return h + section("", `<div class="list empty"><div class="ic">${ICON.plus}</div><h3>Comece pelo primeiro aporte</h3>
+      <p>Informe quanto está depositando. O app sugere as compras, guarda o histórico e atualiza os valores.</p>
+      <button class="btn" data-act="goAport">Fazer aporte</button></div>`);
+  }
+  const ult = [...S.aportes].sort((a, b) => b.data.localeCompare(a.data))[0];
+  h += `<div class="section"><div class="tiles">
+    <div class="tile"><div class="k">Depositado</div><div class="v num">${brl(P.depositado)}</div></div>
+    <div class="tile"><div class="k">Renda por mês</div><div class="v num">${brl(P.renda)}</div></div></div></div>`;
+  h += section("", list([
+    cell({ t: aportouNoMes() ? "Aporte do mês feito" : "Aporte do mês pendente", s:`Último: ${brl(ult.valor)} em ${fmtDate(ult.data)}`, act:"goAport", v:"Aportar", vcls:"", strong:false })
+  ]), P.caixa > 0.009 ? `${brl(P.caixa)} em caixa, ainda não aplicados. Inclua no próximo aporte.` : "");
+  h += section("Aportes por mês", chartAportes());
+  const hist = [...S.aportes].sort((a, b) => b.data.localeCompare(a.data) || b.id.localeCompare(a.id));
+  h += section("Histórico", list(hist.map(a => {
+    const n = S.compras.filter(c => c.aporteId === a.id).length;
+    return cell({ t:fmtDate(a.data), s:`${n} ${n === 1 ? "compra" : "compras"}`, v:brl(a.valor), strong:true, act:"aporteDet", data:{ id:a.id } });
+  })));
+  h += section("", how("Como o patrimônio é calculado", [
+    P_("Patrimônio = renda fixa líquida + renda variável a preço atual + caixa.", `${brl(P.rfLiq)} + ${brl(P.rvValor)} + ${brl(Math.max(0, P.caixa))} = ${brl(P.total)}`),
+    P_("Caixa = depositado − aplicado.", `${brl(P.depositado)} − ${brl(P.gasto)} = ${brl(P.caixa)}`),
+    P_("Renda por mês = rendimento líquido de 1 mês da renda fixa + valor da renda variável × DY ÷ 12.")
+  ]));
+  return h;
+}
+function chartAportes(){
+  const byM = {};
+  for (const a of S.aportes){ const k = a.data.slice(0,7); byM[k] = (byM[k] || 0) + a.valor; }
+  const keys = Object.keys(byM).sort(), last = keys.slice(-12);
+  let acc = keys.slice(0, keys.length - last.length).reduce((s, k) => s + byM[k], 0);
+  const cum = last.map(k => acc += byM[k]);
+  const W = 340, H = 150, pad = 18, bw = (W - pad * 2) / Math.max(last.length, 1);
+  const maxB = Math.max(...last.map(k => byM[k]), 1), maxC = Math.max(...cum, 1);
+  const y = (v, m) => H - 24 - (v / m) * (H - 46), x = i => pad + i * bw + bw / 2;
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Aportes por mês e total acumulado">
+    ${last.map((k, i) => `<rect x="${x(i) - bw * .3}" y="${y(byM[k], maxB)}" width="${bw * .6}" height="${H - 24 - y(byM[k], maxB)}" rx="4" fill="var(--rf)"/>`).join("")}
+    ${cum.length > 1 ? `<polyline points="${cum.map((v, i) => `${x(i)},${y(v, maxC)}`).join(" ")}" fill="none" stroke="var(--rv)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ""}
+    ${cum.map((v, i) => `<circle cx="${x(i)}" cy="${y(v, maxC)}" r="3.5" fill="var(--rv)"/>`).join("")}
+    ${last.map((k, i) => (last.length <= 6 || i % 2 === 0) ? `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="var(--label2)">${k.slice(5)}/${k.slice(2,4)}</text>` : "").join("")}
+  </svg><div class="sf" style="margin:2px 4px 4px"><span class="dot" style="background:var(--rf)"></span>Aporte do mês <span class="dot" style="background:var(--rv);margin-left:10px"></span>Acumulado</div></div>`;
+}
+function aporteSheet(id){
+  const a = S.aportes.find(x => x.id === id); if (!a) return;
+  const cs = S.compras.filter(c => c.aporteId === id), tot = cs.reduce((s, c) => s + c.qtd * c.preco, 0);
+  openSheet({ title:`Aporte de ${fmtDate(a.data)}`, body:
+    section("Compras", list(cs.length ? cs.map(c => { const f = findAsset(c.code), em = c.classe === "rf" && !(f && f.a.preco);
+      return cell({ t:esc(f ? f.a.nome : c.code), s: em ? "Aplicação em R$" : `${nfmt(c.qtd, 4)} × ${brl(c.preco)}`, v:brl(c.qtd * c.preco), strong:true }); })
+      : [cell({ t:'<span class="muted">Sem compras registradas</span>' })])) +
+    section("", list([cell({ t:"Depositado", v:brl(a.valor) }), cell({ t:"Aplicado", v:brl(tot) })])) +
+    section("", list([`<button class="textbtn red" data-act="delAporte" data-id="${esc(id)}">Apagar aporte e compras</button>`])) });
+}
+
+/* ===================== Renda fixa ===================== */
+function viewRF(P){
+  let h = `<div class="section"><div class="tiles">
+    <div class="tile"><div class="k">Aplicado</div><div class="v num">${brl(P.rfApl)}</div></div>
+    <div class="tile"><div class="k">Líquido hoje</div><div class="v num">${brl(P.rfLiq)}</div></div>
+    <div class="tile"><div class="k">Rendimento</div><div class="v num ${P.rfLiq - P.rfApl >= 0 ? "pos" : "neg"}">${signed(P.rfLiq - P.rfApl)}</div></div>
+    <div class="tile"><div class="k">IR + IOF hoje</div><div class="v num">${brl(P.rfIR + P.rfIOF)}</div></div></div></div>`;
+  h += section("Suas aplicações", P.rfList.length ? list(P.rfList.map(x => cell({
+      t:esc(x.prod ? x.prod.nome : x.code), s: x.prod ? `${esc(rateLabel(x.prod))} · ${pct(annualRate(x.prod, S.premissas))} a.a.` : "Produto removido",
+      v:brl(x.liq), vs:signed(x.liq - x.A), vcls: x.liq - x.A >= 0 ? "pos" : "neg", strong:true, act:"rfDet", data:{ code:x.code } })))
+    : list([`<div class="empty"><p>As aplicações aparecem aqui depois do primeiro aporte.</p><button class="btn" data-act="goAport">Fazer aporte</button></div>`]));
+  h += section("Produtos e taxas", list([...S.rf.map(p => cell({
+      t:`${esc(p.nome)}${p.aloc > 0 ? `<span class="badge">${pct(p.aloc, 0)}</span>` : ""}`, s:`${esc(rateLabel(p))} · ${esc(p.liq)}`,
+      v:pct(annualRate(p, S.premissas)), act:"editRF", data:{ code:p.code } })),
+      `<button class="textbtn" data-act="newRF">Adicionar produto</button>`]), "O selo mostra a parte de cada aporte de renda fixa que vai para o produto.");
+  h += section("", how("Como a renda fixa é calculada", [
+    P_(`Taxa anual: % do CDI × CDI (${pct(S.premissas.cdi)}); % da Selic × Selic (${pct(S.premissas.selic)}); IPCA+: (1 + IPCA) × (1 + taxa) − 1; poupança: (1 + 0,5% + TR) por mês.`),
+    P_("Bruto = aplicado × (1 + taxa anual)^(dias ÷ 365)."),
+    P_("IOF, até o 29º dia = rendimento × tabela regressiva (96% → 0%)."),
+    P_("IR = (rendimento − IOF) × alíquota: 22,5% até 180 dias, 20% até 360, 17,5% até 720, 15% acima. LCI, LCA e poupança são isentas."),
+    P_("Cada aplicação conta o próprio prazo. Prefixado e IPCA+ usam a taxa contratada, não o preço de mercado.")
+  ]));
+  return h;
+}
+function rfDetail(code){
+  const x = portfolio().rfList.find(h => h.code === code); if (!x) return;
+  const itens = [...x.itens].sort((a, b) => b.c.data.localeCompare(a.c.data));
+  openSheet({ title:x.prod ? x.prod.nome : code, body: itens.map(({ c, k }) =>
+    section(`Aplicação de ${fmtDate(c.data)} · ${k.d} dias`, list([
+      cell({ t:"Aplicado", v:brl(k.A) }),
+      cell({ t:"Bruto hoje", v:brl(k.bruto), s:`${brl(k.A)} × (1 + ${pct(k.r)})^(${k.d} ÷ 365)` }),
+      ...(k.iof > 0 ? [cell({ t:"IOF", v:"− " + brl(k.iof), s:`${pct(iofRate(k.d), 0)} do rendimento` })] : []),
+      cell({ t:"IR", v:"− " + brl(k.ir), s:`${pct(k.aliq, 1)} de ${brl(Math.max(0, k.rend - k.iof))}` }),
+      cell({ t:"<b>Líquido</b>", v:brl(k.liq), strong:true }),
+      `<button class="textbtn red" data-act="delCompra" data-id="${esc(c.id)}">Apagar esta aplicação</button>`
+    ]))).join("") });
+}
+
+/* ===================== Renda variável ===================== */
+let rvFilter = "todos";
+const isFII = a => a && String(a.tipo).startsWith("FII");
+function viewRV(P){
+  let h = `<div class="section"><div class="tiles">
+    <div class="tile"><div class="k">Valor atual</div><div class="v num">${brl(P.rvValor)}</div></div>
+    <div class="tile"><div class="k">Resultado</div><div class="v num ${P.rvValor - P.rvCusto >= 0 ? "pos" : "neg"}">${signed(P.rvValor - P.rvCusto)}</div></div>
+    <div class="tile"><div class="k">Custo</div><div class="v num">${brl(P.rvCusto)}</div></div>
+    <div class="tile"><div class="k">Dividendos/mês</div><div class="v num">${brl(P.rvMensal)}</div></div></div></div>`;
+  h += `<div class="section"><div class="seg" role="group" aria-label="Filtro">${[["todos","Todos"],["fii","FIIs"],["acao","Ações"]].map(([k, l]) => `<button data-act="rvFilter" data-k="${k}" aria-pressed="${rvFilter === k}">${l}</button>`).join("")}</div></div>`;
+  const pass = a => rvFilter === "todos" || (rvFilter === "fii" ? isFII(a) : !isFII(a));
+  const pos = P.rvList.filter(x => pass(x.a));
+  h += section("Posições", pos.length ? list(pos.map(x => cell({
+      t:`${esc(x.code)}`, s:`${nfmt(x.qtd, 4)} × ${x.p ? brl(x.p) : "sem preço"} · PM ${brl(x.pm)}`,
+      v:brl(x.valor), vs:pct(x.custo > 0 ? x.lp / x.custo : 0), vcls: x.lp >= 0 ? "pos" : "neg", strong:true, act:"rvDet", data:{ code:x.code } })))
+    : list([`<div class="empty"><p>As posições aparecem aqui depois do primeiro aporte.</p><button class="btn" data-act="goAport">Fazer aporte</button></div>`]));
+  h += section("Ativos acompanhados", list([`<button class="textbtn" data-act="prices">Atualizar preços</button>`,
+      ...S.rv.filter(pass).map(a => cell({ t:`${esc(a.code)}${a.aloc > 0 ? `<span class="badge">${pct(a.aloc, 0)}</span>` : ""}`,
+        s:`${esc(a.nome)} · DY ${pct(a.dy)}`, v: a.preco ? brl(a.preco) : "sem preço", act:"editRV", data:{ code:a.code } })),
+      `<button class="textbtn" data-act="newRV">Adicionar ativo</button>`]), "O selo mostra a parte de cada aporte de renda variável que vai para o ativo.");
+  h += section("", how("Como a renda variável é calculada", [
+    P_("Valor = quantidade × preço atual. Sem preço, usa o custo."), P_("Preço médio = custo total ÷ quantidade."),
+    P_("Resultado = valor − custo."), P_("Dividendos/mês = valor × DY ÷ 12. O DY é passado ou projetado e não é garantido."),
+    P_("Dividendos de FIIs são isentos de IR. Na venda, ações são isentas até R$ 20 mil vendidos no mês; FIIs pagam 20% sobre o lucro.")
+  ]));
+  return h;
+}
+function rvDetail(code){
+  const x = portfolio().rvList.find(h => h.code === code); if (!x) return;
+  openSheet({ title:code, body:
+    section(esc(x.a ? x.a.nome : ""), list([
+      cell({ t:"Quantidade", v:nfmt(x.qtd, 4) }), cell({ t:"Preço médio", v:brl(x.pm) }),
+      cell({ t:"Preço atual", v:x.p ? brl(x.p) : "sem preço" }), cell({ t:"Custo", v:brl(x.custo) }),
+      cell({ t:"Valor atual", v:brl(x.valor), s:`${nfmt(x.qtd, 4)} × ${x.p ? brl(x.p) : "custo"}` }),
+      cell({ t:"Resultado", v:signed(x.lp), vcls:x.lp >= 0 ? "pos" : "neg" }),
+      cell({ t:"Dividendos/mês", v:brl(x.renda / 12), s:`${brl(x.valor)} × ${pct(x.a ? x.a.dy : 0)} ÷ 12` })])) +
+    section("Compras", list([...x.itens].sort((a, b) => b.data.localeCompare(a.data)).map(c =>
+      cell({ t:fmtDate(c.data), s:`${nfmt(c.qtd, 4)} × ${brl(c.preco)}`, v:brl(c.qtd * c.preco) }) +
+      `<button class="textbtn red" style="padding-top:0" data-act="delCompra" data-id="${esc(c.id)}">Apagar compra de ${fmtDate(c.data)}</button>`))) });
+}
+function pricesSheet(){
+  const held = new Set(S.compras.filter(c => c.classe === "rv").map(c => c.code));
+  const ord = [...S.rv].sort((a, b) => (held.has(b.code) || b.aloc > 0) - (held.has(a.code) || a.aloc > 0));
+  openSheet({ title:"Preços", left:"Cancelar", right:{ label:"Salvar", act: savePrices }, body:
+    section("Cotação atual", list(ord.map(a => `<div class="field"><label for="pr-${esc(a.code)}">${esc(a.code)} <span class="muted" style="font-size:15px">${esc(a.nome)}</span></label>
+      <input id="pr-${esc(a.code)}" class="num" inputmode="decimal" data-price="${esc(a.code)}" value="${a.preco ? nfmt(a.preco) : ""}" placeholder="R$ 0,00"></div>`)), "Use as cotações do app da sua corretora.") });
+}
+function savePrices(){
+  document.querySelectorAll("[data-price]").forEach(el => { const a = S.rv.find(x => x.code === el.dataset.price), v = parseNum(el.value); if (a) a.preco = isFinite(v) && v > 0 ? v : null; });
+  closeSheet(); commit("Preços salvos");
+}
+
+/* ===================== Aportar ===================== */
+let draft, step = 1;
+function resetDraft(){ step = 1; draft = { valor:"", data:todayISO(), saldo:true, lines:[], err:"" }; }
+resetDraft();
+function buildSuggestion(base){
+  const lines = [], rvVal = base * (1 - S.split.rf);
+  let custoRV = 0;
+  for (const a of S.rv.filter(a => a.aloc > 0)){
+    const alvo = rvVal * a.aloc, ok = a.preco > 0, qtd = ok ? Math.floor(alvo / a.preco) : 0;
+    custoRV += qtd * (a.preco || 0);
+    lines.push({ classe:"rv", code:a.code, nome:a.nome, unit:"cotas", qtd, preco:a.preco || 0, alvo,
+      warn: ok ? (qtd === 0 ? "Valor do mês menor que 1 cota." : "") : "Informe o preço para calcular." });
+  }
+  const sobra = rvVal - custoRV, rfVal = base * S.split.rf + sobra;
+  for (const p of S.rf.filter(p => p.aloc > 0)){
+    const alvo = rfVal * p.aloc;
+    if (p.preco > 0){ const qtd = Math.floor(alvo / p.preco * 100) / 100;
+      lines.push({ classe:"rf", code:p.code, nome:p.nome, unit:"títulos", qtd, preco:p.preco, alvo, warn: alvo < p.min ? `Abaixo do mínimo de ${brl(p.min)}.` : "" }); }
+    else { const v = Math.floor(alvo * 100) / 100;
+      lines.push({ classe:"rf", code:p.code, nome:p.nome, unit:"R$", qtd:v, preco:1, alvo, warn: v > 0 && v < p.min ? `Abaixo do mínimo de ${brl(p.min)}.` : "" }); }
+  }
+  return { lines, sobra };
+}
+function viewAportar(P){
+  const bar = `<div class="progress" aria-label="Etapa ${step} de 3">${[1,2,3].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>`;
+  if (step === 1){
+    const sRF = S.rf.reduce((s, p) => s + p.aloc, 0), sRV = S.rv.reduce((s, a) => s + a.aloc, 0), bad = Math.abs(sRF - 1) > .001 || Math.abs(sRV - 1) > .001;
+    return bar + section("", `<div class="list"><input class="amount num" id="aValor" inputmode="decimal" placeholder="R$ 0" value="${esc(draft.valor)}" aria-label="Valor do depósito" autocomplete="off">
+        <div class="sf" style="text-align:center;margin:0 0 14px">Quanto você está depositando agora</div></div>`) +
+      section("", list([
+        `<div class="field"><label for="aData">Data</label><input type="date" id="aData" value="${esc(draft.data)}"></div>`,
+        ...(P.caixa > 0.009 ? [`<div class="field"><label for="aSaldo">Incluir caixa <span class="muted num">${brl(P.caixa)}</span></label><input type="checkbox" class="switch" id="aSaldo" ${draft.saldo ? "checked" : ""}></div>`] : [])
+      ])) +
+      section("Divisão", list([`<div class="field" style="display:block;padding:12px 16px"><div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span><span class="dot" style="background:var(--rf)"></span>Renda fixa <b id="sRF" class="num">${pct(S.split.rf, 0)}</b></span>
+        <span><span class="dot" style="background:var(--rv)"></span>Variável <b id="sRV" class="num">${pct(1 - S.split.rf, 0)}</b></span></div>
+        <input type="range" id="aSplit" min="0" max="100" step="5" value="${Math.round(S.split.rf * 100)}" aria-label="Percentual em renda fixa"></div>`]),
+        bad ? `A alocação interna precisa somar 100% (renda fixa ${pct(sRF, 0)}, variável ${pct(sRV, 0)}). Ajuste em Ajustes.` : "Dentro de cada classe, a divisão segue a alocação de Ajustes.", bad ? "neg" : "") +
+      (draft.err ? `<div class="sf neg" style="margin:-16px 32px 16px">${esc(draft.err)}</div>` : "") +
+      `<div class="section"><button class="btn" data-act="toStep2">Ver sugestão</button></div>`;
+  }
+  if (step === 2){
+    const line = (l, i) => `<div class="cell" style="display:block">
+      <div style="display:flex;justify-content:space-between;gap:8px"><span class="t" style="font-weight:600">${esc(l.classe === "rv" ? l.code : l.nome)}</span><span class="muted num" style="font-size:15px">alvo ${brl(l.alvo)}</span></div>
+      <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
+      ${l.unit === "R$" ? `<span class="muted" style="font-size:15px">Valor</span><input class="pricein num" inputmode="decimal" data-li="${i}" data-f="qtd" value="${nfmt(l.qtd)}" aria-label="Valor em ${esc(l.nome)}">`
+        : `<div class="stepper"><button data-act="stepQ" data-li="${i}" data-d="-1" aria-label="Menos">−</button><button data-act="stepQ" data-li="${i}" data-d="1" aria-label="Mais">+</button></div>
+           <input class="qty num" inputmode="decimal" data-li="${i}" data-f="qtd" value="${nfmt(l.qtd)}" aria-label="${l.unit} de ${esc(l.code)}">
+           <span class="muted" style="font-size:15px">×</span><input class="pricein num" inputmode="decimal" data-li="${i}" data-f="preco" value="${nfmt(l.preco)}" aria-label="Preço de ${esc(l.code)}">`}
+      </div>${l.warn ? `<div class="warn">${esc(l.warn)}</div>` : ""}</div>`;
+    const idx = draft.lines.map((l, i) => [l, i]);
+    const rv = idx.filter(([l]) => l.classe === "rv"), rf = idx.filter(([l]) => l.classe === "rf");
+    return bar + section(`<span class="dot" style="background:var(--rv)"></span>Renda variável`, list(rv.length ? rv.map(([l, i]) => line(l, i)) : [cell({ t:'<span class="muted">Nenhum ativo com alocação</span>' })])) +
+      section(`<span class="dot" style="background:var(--rf)"></span>Renda fixa`, list(rf.length ? rf.map(([l, i]) => line(l, i)) : [cell({ t:'<span class="muted">Nenhum produto com alocação</span>' })]),
+        `Inclui ${brl(draft.sobra)} que sobraram do arredondamento das cotas.`) +
+      `<div class="section" id="aSum"></div>
+      <div class="section btnrow"><button class="btn gray" data-act="toStep1">Voltar</button><button class="btn" data-act="confirm" id="btnConfirm">Confirmar</button></div>`;
+  }
+  const r = draft.result;
+  return bar + `<div class="section"><div class="list empty"><div class="done">${ICON.check}</div><h3>Aporte registrado</h3>
+    <p>${brl(r.valor)} em ${fmtDate(r.data)}. ${brl(r.aplicado)} aplicados em ${r.n} ${r.n === 1 ? "ativo" : "ativos"}${r.caixa > 0.009 ? `, ${brl(r.caixa)} em caixa` : ""}.</p>
+    <button class="btn" data-act="goHome">Ver início</button>
+    ${canWidget() ? `<button class="btn gray" style="margin-top:10px" data-act="widget">Atualizar widget</button>` : ""}</div></div>`;
+}
+function updateAporteSum(){
+  const el = $("#aSum"); if (!el) return;
+  const tot = draft.lines.reduce((s, l) => s + (l.qtd || 0) * (l.preco || 0), 0), fica = draft.base - tot;
+  el.innerHTML = list([cell({ t:"Disponível", v:brl(draft.base) }), cell({ t:"A aplicar", v:brl(tot), strong:true }),
+    cell({ t:"Fica em caixa", v:brl(fica), vcls: fica < -0.009 ? "neg" : "" })]) + (fica < -0.009 ? `<div class="sf neg">O total passa do disponível. Reduza alguma quantidade.</div>` : "");
+  const b = $("#btnConfirm"); if (b) b.disabled = fica < -0.009;
+}
+
+/* ===================== Simulador ===================== */
+function viewSimular(){
+  const s = S.sim, pr = S.premissas;
+  const res = SIM_PRODUCTS.map((p, i) => ({ p, i, r: simulate(p, s.v0, s.a, s.n, pr) })).sort((a, b) => b.r.liq - a.r.liq);
+  const ref = res.find(x => x.p.ref), lo = Math.min(0, ...res.map(x => x.r.rend)), hi = Math.max(...res.map(x => x.r.rend));
+  return section("Cenário", list([
+      `<div class="field"><label for="sv0">Valor inicial</label><input id="sv0" class="num" inputmode="decimal" data-sim="v0" value="${nfmt(s.v0)}"></div>`,
+      `<div class="field"><label for="sa">Aporte mensal</label><input id="sa" class="num" inputmode="decimal" data-sim="a" value="${nfmt(s.a)}"></div>`,
+      `<div class="field"><label for="sn">Prazo em meses</label><input id="sn" class="num" inputmode="numeric" data-sim="n" value="${s.n}"></div>`
+    ]), `Total investido ${brl(s.v0 + s.a * s.n)}. CDI ${pct(pr.cdi)}, Selic ${pct(pr.selic)}, IPCA ${pct(pr.ipca)}; altere em Ajustes.`) +
+    section(`Valor líquido em ${s.n} ${s.n === 1 ? "mês" : "meses"}`, list(res.map((x, k) => `<button class="cell" data-act="simDet" data-i="${x.i}">
+      <span class="rank ${k === 0 ? "first" : ""}">${k + 1}</span>
+      <span class="tx"><span class="t">${esc(x.p.nome)}${x.p.isento ? `<span class="badge">isento</span>` : ""}</span>
+        <span class="s" style="display:block">CDB equivalente: ${pct(x.r.eqCDB, 1)} do CDI</span>
+        <span class="meter"><span style="width:${hi > lo ? Math.max(3, (x.r.rend - lo) / (hi - lo) * 100) : 100}%;background:${x.p.isento ? "var(--rv)" : "var(--rf)"}"></span></span></span>
+      <span class="v num strong">${brl(x.r.liq)}<small class="${x.r.liq - ref.r.liq >= 0 ? "pos" : "neg"}">${x.p.ref ? "referência" : signed(x.r.liq - ref.r.liq)}</small></span>${ICON.chev}</button>`)),
+      "Abaixo do valor: diferença em relação ao Tesouro Selic.") +
+    section("", how("Como o simulador calcula", [
+      P_("Taxa mensal i = (1 + taxa anual − custódia)^(1/12) − 1."),
+      P_("Final = inicial × (1 + i)^n + Σ aporte × (1 + i)^(meses restantes)."),
+      P_("Cada aporte paga o IR do próprio prazo: 22,5% até 180 dias, 20% até 360, 17,5% até 720, 15% acima."),
+      P_("CDB equivalente: % do CDI que um CDB com IR precisaria pagar para empatar. LCI equivalente: % do CDI que uma aplicação isenta precisaria pagar.")
+    ]));
+}
+function simDetail(i){
+  const p = SIM_PRODUCTS[i], s = S.sim, pr = S.premissas, r = simulate(p, s.v0, s.a, s.n, pr), ref = simulate(SIM_PRODUCTS.find(x => x.ref), s.v0, s.a, s.n, pr);
+  openSheet({ title:p.nome, body: section(`${esc(rateLabel(p))} · ${esc(p.liq)}`, list([
+    cell({ t:"Taxa anual bruta", v:pct(annualRate(p, pr)) }), ...(p.custo ? [cell({ t:"Custódia B3", v:"− " + pct(p.custo) })] : []),
+    cell({ t:"Taxa mensal", v:pct(r.i, 3), s:`(1 + ${pct(r.r)})^(1/12) − 1` }), cell({ t:"Investido", v:brl(r.inv) }),
+    cell({ t:"Bruto final", v:brl(r.bruto) }), cell({ t:"IR", v:p.isento ? "isento" : "− " + brl(r.ir) }),
+    cell({ t:"<b>Líquido final</b>", v:brl(r.liq), strong:true }), cell({ t:"Rendimento líquido", v:signed(r.rend), vcls:"pos" }),
+    cell({ t:"Taxa líquida anual", v:pct(r.taxaLiq) }), cell({ t:"CDB equivalente", v:`${pct(r.eqCDB, 1)} do CDI` }),
+    cell({ t:"LCI equivalente", v:`${pct(r.eqLCI, 1)} do CDI` }), cell({ t:"vs Tesouro Selic", v:signed(r.liq - ref.liq), vcls: r.liq - ref.liq >= 0 ? "pos" : "neg" })
+  ])) });
+}
+
+/* ===================== Ajustes ===================== */
+const standalone = () => window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+const canWidget = () => { try { return window.top === window.self; } catch(e){ return false; } };
+function viewAjustes(){
+  const pr = S.premissas, sRF = S.rf.reduce((s, p) => s + p.aloc, 0), sRV = S.rv.reduce((s, a) => s + a.aloc, 0);
+  const pf = (k, label, d = 2) => `<div class="field"><label for="p-${k}">${label}</label><input id="p-${k}" class="num" inputmode="decimal" data-prem="${k}" value="${nfmt(pr[k] * 100, d)}"><span class="muted">%</span></div>`;
+  const al = (arr, cls) => arr.map(a => `<div class="field"><label for="al-${esc(a.code)}">${esc(cls === "rv" ? a.code : a.nome)}</label><input id="al-${esc(a.code)}" class="num" inputmode="decimal" data-aloc="${cls}" data-code="${esc(a.code)}" value="${nfmt(a.aloc * 100)}" style="width:70px"><span class="muted">%</span></div>`);
+  const off = (x) => Math.abs(x - 1) > .001;
+  let h = section("Premissas", list([pf("cdi","CDI ao ano"), pf("selic","Selic ao ano"), pf("ipca","IPCA ao ano"), pf("tr","TR ao mês", 3)]), "Referência de set/2026: Selic 13,75% e CDI ≈ 13,65%.");
+  h += section("Divisão do aporte", list([`<div class="field" style="display:block;padding:12px 16px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Renda fixa <b id="sRF" class="num">${pct(S.split.rf, 0)}</b></span><span>Variável <b id="sRV" class="num">${pct(1 - S.split.rf, 0)}</b></span></div><input type="range" min="0" max="100" step="5" value="${Math.round(S.split.rf * 100)}" data-split aria-label="Percentual em renda fixa"></div>`]));
+  h += section("Alocação na renda fixa", list(al(S.rf, "rf")), `Soma ${pct(sRF, 0)}${off(sRF) ? " — precisa ser 100%" : ""}`, off(sRF) ? "neg" : "");
+  h += section("Alocação na renda variável", list(al(S.rv, "rv")), `Soma ${pct(sRV, 0)}${off(sRV) ? " — precisa ser 100%" : ""}`, off(sRV) ? "neg" : "");
+  if (canWidget()){
+    h += section("Widget e Atalhos", list([
+      cell({ t:"Atualizar widget", s:"Envia o resumo para o Scriptable", icon:ICON.widget, iconBg:"var(--tint)", act:"widget" }),
+      `<div class="field"><label for="scName">Nome do atalho</label><input id="scName" data-pref="shortcut" value="${esc(S.prefs.shortcut)}" autocomplete="off"></div>`,
+      `<div class="field"><label for="autoW">Atualizar ao confirmar aporte</label><input type="checkbox" class="switch" id="autoW" data-prefbool="autoWidget" ${S.prefs.autoWidget ? "checked" : ""}></div>`,
+      ...("setAppBadge" in navigator ? [`<div class="field"><label for="bdg">Selo de aporte pendente</label><input type="checkbox" class="switch" id="bdg" data-prefbool="badge" ${S.prefs.badge ? "checked" : ""}></div>`] : [])
+    ]), "O atalho precisa existir no app Atalhos com esse nome exato. Veja o guia de configuração.");
+  }
+  h += section("Backup", list([
+    `<div class="cell" style="display:block"><textarea class="in" id="bkOut" readonly rows="3" aria-label="Backup">${esc(JSON.stringify(S))}</textarea></div>`,
+    `<button class="textbtn" data-act="copyBk">Copiar backup</button>`,
+    `<div class="cell" style="display:block"><textarea class="in" id="bkIn" rows="3" placeholder="Cole aqui um backup para restaurar" aria-label="Restaurar backup"></textarea></div>`,
+    `<button class="textbtn" data-act="restoreBk">Restaurar backup</button>`
+  ]), remote.mode === "sync" ? "Sincronizado com sua conta Claude." : standalone() ? "Salvo neste iPhone. Faça backup de tempos em tempos." : "Salvo neste aparelho.");
+  h += section("", list([`<button class="textbtn red" data-act="wipe">Apagar todos os dados</button>`]), "Informações para estudo, não recomendação de investimento.");
+  return h;
+}
+
+/* ===================== Edição de ativos ===================== */
+function editRFSheet(code){
+  const p = code ? S.rf.find(x => x.code === code) : { code:"", nome:"", liq:"Diária", idx:"cdi", taxa:1, isento:false, min:1, preco:null };
+  const tv = (p.idx === "cdi" || p.idx === "selic") ? nfmt(p.taxa * 100) : nfmt(p.taxa * 100, 4);
+  const f = (id, label, val, extra = "") => `<div class="field"><label for="${id}">${label}</label><input id="${id}" value="${esc(val)}" ${extra}></div>`;
+  openSheet({ title: code ? "Editar produto" : "Novo produto", left:"Cancelar", right:{ label:"Salvar", act:() => saveRF(code) }, body:
+    section("", list([f("eNome","Nome",p.nome,'placeholder="CDB Banco X"'), ...(code ? [] : [f("eCode","Código",'','placeholder="CDB-BANCO" autocapitalize="characters"')]),
+      `<div class="field"><label for="eIdx">Indexador</label><select id="eIdx">${[["cdi","% do CDI"],["selic","% da Selic"],["pre","Prefixado"],["ipca","IPCA +"],["poup","Poupança"]].map(o => `<option value="${o[0]}" ${p.idx === o[0] ? "selected" : ""}>${o[1]}</option>`).join("")}</select></div>`,
+      f("eTaxa","Taxa (%)",tv,'inputmode="decimal" class="num"'), f("eLiq","Liquidez",p.liq),
+      f("eMin","Aplicação mínima",nfmt(p.min),'inputmode="decimal" class="num"'), f("ePreco","Preço do título",p.preco ? nfmt(p.preco) : "",'inputmode="decimal" class="num" placeholder="opcional"'),
+      `<div class="field"><label for="eIsento">Isento de IR</label><input type="checkbox" class="switch" id="eIsento" ${p.isento ? "checked" : ""}></div>`]),
+      "Taxa: 105 para 105% do CDI; 13,72 para prefixado; 6,55 para IPCA + 6,55%. Com preço, o app sugere número de títulos.") +
+    (code ? section("", list([`<button class="textbtn red" data-act="delRF" data-code="${esc(code)}">Remover produto</button>`])) : "") });
+}
+function saveRF(code){
+  const nome = $("#eNome").value.trim(), t = parseNum($("#eTaxa").value);
+  if (!nome || !isFinite(t)){ toast("Preencha nome e taxa"); return; }
+  let p = code ? S.rf.find(x => x.code === code) : null;
+  if (!p){ const c = ($("#eCode").value || nome).trim().toUpperCase().replace(/\s+/g, "-"); if (findAsset(c)){ toast("Esse código já existe"); return; } p = { code:c, aloc:0, obs:"", tipo:"Renda fixa" }; S.rf.push(p); }
+  const preco = parseNum($("#ePreco").value), min = parseNum($("#eMin").value);
+  Object.assign(p, { nome, idx:$("#eIdx").value, taxa:t / 100, liq:$("#eLiq").value.trim() || "—", isento:$("#eIsento").checked, min:isFinite(min) ? min : 0, preco:isFinite(preco) && preco > 0 ? preco : null });
+  closeSheet(); commit("Produto salvo");
+}
+function editRVSheet(code){
+  const a = code ? S.rv.find(x => x.code === code) : { code:"", nome:"", tipo:"Ação", setor:"", dy:0, preco:null };
+  const f = (id, label, val, extra = "") => `<div class="field"><label for="${id}">${label}</label><input id="${id}" value="${esc(val)}" ${extra}></div>`;
+  openSheet({ title: code ? a.code : "Novo ativo", left:"Cancelar", right:{ label:"Salvar", act:() => saveRV(code) }, body:
+    section("", list([...(code ? [] : [f("eCode","Código B3","",'placeholder="TAEE11" autocapitalize="characters"')]), f("eNome","Nome",a.nome),
+      `<div class="field"><label for="eTipo">Tipo</label><select id="eTipo">${["FII de papel","FII de tijolo","FII híbrido","Ação","ETF"].map(t => `<option ${a.tipo === t ? "selected" : ""}>${t}</option>`).join("")}</select></div>`,
+      f("eSetor","Setor",a.setor), f("eDy","DY anual (%)",nfmt(a.dy * 100),'inputmode="decimal" class="num"'), f("ePreco","Preço atual",a.preco ? nfmt(a.preco) : "",'inputmode="decimal" class="num" placeholder="R$ 0,00"')])) +
+    (code ? section("", list([`<button class="textbtn red" data-act="delRV" data-code="${esc(code)}">Remover ativo</button>`])) : "") });
+}
+function saveRV(code){
+  let a = code ? S.rv.find(x => x.code === code) : null;
+  if (!a){ const c = $("#eCode").value.trim().toUpperCase(); if (!c){ toast("Informe o código"); return; } if (findAsset(c)){ toast("Esse código já existe"); return; } a = { code:c, aloc:0, risco:"" }; S.rv.push(a); }
+  const dy = parseNum($("#eDy").value), preco = parseNum($("#ePreco").value);
+  Object.assign(a, { nome:$("#eNome").value.trim() || a.code, tipo:$("#eTipo").value, setor:$("#eSetor").value.trim(), dy:isFinite(dy) ? dy / 100 : 0, preco:isFinite(preco) && preco > 0 ? preco : null });
+  closeSheet(); commit("Ativo salvo");
+}
+
+/* ===================== Widget, Atalhos e selo ===================== */
+function widgetSummary(){
+  const P = portfolio(), ult = [...S.aportes].sort((a, b) => b.data.localeCompare(a.data))[0];
+  const top = [...P.rvList.map(x => ({ c:x.code, v:x.valor })), ...P.rfList.map(x => ({ c:x.prod ? x.prod.nome : x.code, v:x.liq }))].sort((a, b) => b.v - a.v).slice(0, 3);
+  const r2 = x => Math.round(x * 100) / 100;
+  return { app:"carteira", v:1, at:new Date().toISOString(), total:r2(P.total), depositado:r2(P.depositado), ganho:r2(P.ganho),
+    rf:r2(P.rfLiq), rv:r2(P.rvValor), caixa:r2(Math.max(0, P.caixa)), renda:r2(P.renda), aportes:S.aportes.length,
+    mes:monthKey(), aportouMes:aportouNoMes(), ultimo: ult ? { data:ult.data, valor:ult.valor } : null,
+    top:top.map(t => ({ c:t.c, v:r2(t.v) })), premissas:S.premissas };
+}
+function sendWidget(){
+  const url = "shortcuts://run-shortcut?name=" + encodeURIComponent(S.prefs.shortcut || PREFS.shortcut) + "&input=text&text=" + encodeURIComponent(JSON.stringify(widgetSummary()));
+  window.location.href = url;
+}
+let lastBadge = null;
+function updateBadge(){
+  if (!S.prefs.badge || !("setAppBadge" in navigator)) return;
+  const want = aportouNoMes() ? 0 : 1; if (want === lastBadge) return; lastBadge = want;
+  (want ? navigator.setAppBadge(1) : navigator.clearAppBadge()).catch(() => {});
+}
+async function enableBadge(on){
+  if (on && "Notification" in window && Notification.permission !== "granted"){
+    const r = await Notification.requestPermission().catch(() => "denied");
+    if (r !== "granted"){ S.prefs.badge = false; commit(); toast("Permissão negada"); return; }
+  }
+  S.prefs.badge = on; lastBadge = null;
+  if (!on && "clearAppBadge" in navigator) navigator.clearAppBadge().catch(() => {});
+  commit(on ? "Selo ativado" : "Selo desativado");
+}
+
+/* atalhos de URL: ?aba=aportar&valor=500 ou ?aporte=500 */
+(function readURL(){
+  const q = new URLSearchParams(location.search);
+  const aba = q.get("aba") || q.get("tab"), val = q.get("aporte") || q.get("valor");
+  if (val){ resetDraft(); draft.valor = val; tab = "aportar"; }
+  else if (aba && TITLES[aba]) tab = aba;
+  if ((aba || val) && history.replaceState) history.replaceState(null, "", location.pathname);
+})();
+
+/* ===================== Eventos ===================== */
+function bindView(){
+  main.querySelectorAll("[data-sim]").forEach(el => el.onchange = () => {
+    const v = parseNum(el.value), k = el.dataset.sim;
+    if (!isFinite(v) || v < 0){ toast("Valor inválido"); render(); return; }
+    S.sim[k] = k === "n" ? Math.min(600, Math.max(1, Math.round(v))) : v; commit();
+  });
+  main.querySelectorAll("[data-prem]").forEach(el => el.onchange = () => {
+    const v = parseNum(el.value); if (!isFinite(v) || v < 0){ toast("Valor inválido"); render(); return; }
+    S.premissas[el.dataset.prem] = v / 100; commit("Premissa salva");
+  });
+  main.querySelectorAll("[data-aloc]").forEach(el => el.onchange = () => {
+    const v = parseNum(el.value); if (!isFinite(v) || v < 0 || v > 100){ toast("Use de 0 a 100"); render(); return; }
+    const a = (el.dataset.aloc === "rf" ? S.rf : S.rv).find(x => x.code === el.dataset.code); if (a){ a.aloc = v / 100; commit(); }
+  });
+  main.querySelectorAll("[data-pref]").forEach(el => el.onchange = () => { S.prefs[el.dataset.pref] = el.value.trim() || PREFS[el.dataset.pref]; commit("Salvo"); });
+  main.querySelectorAll("[data-prefbool]").forEach(el => el.onchange = () => {
+    if (el.dataset.prefbool === "badge") enableBadge(el.checked); else { S.prefs[el.dataset.prefbool] = el.checked; commit(); }
+  });
+  const split = main.querySelector("#aSplit, [data-split]");
+  if (split){
+    split.oninput = () => { $("#sRF").textContent = split.value + "%"; $("#sRV").textContent = (100 - split.value) + "%"; };
+    split.onchange = () => { S.split.rf = split.value / 100; S.updatedAt = Date.now(); localSave(); scheduleRemote(); if (tab === "ajustes") render(); };
+  }
+  ["aValor","aData","aSaldo"].forEach(id => { const el = $("#" + id); if (el) el.oninput = el.onchange = () => {
+    draft.valor = $("#aValor").value; draft.data = $("#aData").value; const s = $("#aSaldo"); draft.saldo = s ? s.checked : false; }; });
+  main.querySelectorAll("input[data-li]").forEach(el => el.oninput = () => {
+    const v = parseNum(el.value); draft.lines[+el.dataset.li][el.dataset.f] = isFinite(v) && v >= 0 ? v : 0; updateAporteSum();
+  });
+  updateAporteSum();
+}
+const ACTIONS = {
+  goAport: () => { resetDraft(); go("aportar"); },
+  goHome: () => { resetDraft(); go("inicio"); },
+  aporteDet: b => aporteSheet(b.dataset.id), rfDet: b => rfDetail(b.dataset.code), rvDet: b => rvDetail(b.dataset.code),
+  simDet: b => simDetail(+b.dataset.i), prices: pricesSheet,
+  editRF: b => editRFSheet(b.dataset.code), newRF: () => editRFSheet(null), editRV: b => editRVSheet(b.dataset.code), newRV: () => editRVSheet(null),
+  rvFilter: b => { rvFilter = b.dataset.k; render(); },
+  widget: sendWidget,
+  toStep1: () => { step = 1; render(); },
+  toStep2: () => {
+    const v = parseNum(draft.valor), pf = portfolio(), saldo = draft.saldo && pf.caixa > 0.009 ? pf.caixa : 0, val = isFinite(v) ? v : 0;
+    if (val < 0 || (!isFinite(v) && draft.valor)) { draft.err = "Digite um valor válido, como 500 ou 1.250,00."; return render(); }
+    if (val + saldo <= 0){ draft.err = "Informe um valor maior que zero."; return render(); }
+    if (!draft.data){ draft.err = "Escolha a data do aporte."; return render(); }
+    draft.err = ""; draft.valorNum = val; draft.base = val + saldo;
+    const sg = buildSuggestion(draft.base); draft.lines = sg.lines; draft.sobra = sg.sobra; step = 2; window.scrollTo(0, 0); render();
+  },
+  stepQ: b => { const l = draft.lines[+b.dataset.li]; l.qtd = Math.max(0, Math.round((l.qtd || 0) + +b.dataset.d)); const inp = main.querySelector(`input[data-li="${b.dataset.li}"][data-f="qtd"]`); if (inp) inp.value = nfmt(l.qtd); updateAporteSum(); },
+  confirm: () => {
+    const tot = draft.lines.reduce((s, l) => s + (l.qtd || 0) * (l.preco || 0), 0);
+    if (tot - draft.base > 0.009) return toast("O total passa do disponível");
+    let aporteId = null;
+    if (draft.valorNum > 0){ aporteId = uid("a"); S.aportes.push({ id:aporteId, data:draft.data, valor:draft.valorNum }); }
+    const bought = draft.lines.filter(l => l.qtd > 0 && l.preco > 0);
+    for (const l of bought) S.compras.push({ id:uid("c"), data:draft.data, code:l.code, classe:l.classe, qtd:l.qtd, preco:l.preco, aporteId });
+    draft.result = { valor:draft.valorNum, data:draft.data, aplicado:tot, n:bought.length, caixa:draft.base - tot };
+    step = 3; commit("Aporte registrado");
+    if (S.prefs.autoWidget && canWidget()) setTimeout(sendWidget, 900);
+  },
+  delAporte: b => { if (!confirm("Apagar este aporte e as compras ligadas a ele?")) return; const id = b.dataset.id;
+    S.aportes = S.aportes.filter(a => a.id !== id); S.compras = S.compras.filter(c => c.aporteId !== id); closeSheet(); commit("Aporte apagado"); },
+  delCompra: b => { if (!confirm("Apagar este registro?")) return; S.compras = S.compras.filter(c => c.id !== b.dataset.id); closeSheet(); commit("Registro apagado"); },
+  delRF: b => { if (!confirm("Remover este produto? Aplicações registradas ficam no histórico, sem rendimento.")) return; S.rf = S.rf.filter(x => x.code !== b.dataset.code); closeSheet(); commit("Produto removido"); },
+  delRV: b => { if (!confirm("Remover este ativo? Compras registradas continuam na carteira.")) return; S.rv = S.rv.filter(x => x.code !== b.dataset.code); closeSheet(); commit("Ativo removido"); },
+  copyBk: () => {
+    const ta = $("#bkOut"); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = () => toast("Backup copiado"), fb = () => { try { document.execCommand("copy"); ok(); } catch(e){ toast("Selecione e copie o texto"); } };
+    navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(ta.value).then(ok, fb) : fb();
+  },
+  restoreBk: () => {
+    let d; try { d = JSON.parse($("#bkIn").value); } catch(e){ return toast("Backup inválido"); }
+    if (!d || !Array.isArray(d.aportes) || !Array.isArray(d.compras)) return toast("Backup inválido");
+    if (!confirm("Substituir os dados atuais por este backup?")) return;
+    S = mergeDefaults(d); resetDraft(); commit("Backup restaurado");
+  },
+  wipe: () => { if (!confirm("Apagar aportes, compras e ajustes? Isso não pode ser desfeito.")) return; S = mergeDefaults(null); resetDraft(); commit("Dados apagados"); }
+};
+document.addEventListener("click", e => { const b = e.target.closest("[data-act]"); if (b && ACTIONS[b.dataset.act]) ACTIONS[b.dataset.act](b); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && tab === "inicio") render(); });
+render();
+if ("serviceWorker" in navigator && location.protocol === "https:") window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>
